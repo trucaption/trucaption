@@ -1,0 +1,8 @@
+{
+  "api": "browser",
+  "controller_port": 8080,
+  "client_port": 80,
+  "azure_subscription_key": "",
+  "azure_region": "",
+  "speechly_app": ""
+}

@@ -1,0 +1,20 @@
+; Configuration file for Trucaption
+
+; This can be set to "browser", "azure", or "speechly".
+; If using azure or speechly, also configure the appropriate API settings
+# api = browser
+
+; Change port for controller or client page
+# controller_port = 8080
+# client_port = 80
+
+; Azure API settings
+
+; Obtain these values from the Azure portal.
+# azure_subscription_key = 
+# azure_region = 
+
+; Speechly API settings
+
+# speechly_app = 
+

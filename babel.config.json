@@ -1,0 +1,24 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "modules": false
+      }
+    ],
+    [
+      "@babel/preset-react",
+      {
+        "runtime": "automatic"
+      }
+    ]
+  ],
+  "plugins": [
+    [
+      "babel-plugin-direct-import",
+      {
+        "modules": ["@mui/system", "@mui/material", "@mui/icons-material"]
+      }
+    ]
+  ]
+}

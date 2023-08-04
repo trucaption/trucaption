@@ -1,0 +1,78 @@
+{
+  "name": "trucaption",
+  "version": "1.0.0",
+  "description": "Computer-aided realtime transcription",
+  "bin": "server.js",
+  "scripts": {
+    "build:controller": "webpack --mode production --config controller.webpack.config.js",
+    "build:client": "webpack --mode production --config client.webpack.config.js",
+    "build": "npm run check && npm run build:controller && npm run build:client && npm run package",
+    "test": "npm run test:controller && npm run test:client && npm run start",
+    "test:controller": "webpack --mode development --config controller.webpack.config.js",
+    "test:client": "webpack --mode development --config client.webpack.config.js",
+    "start": "node server.js",
+    "package": "pkg . -C Brotli",
+    "format": "npx rome format --write .",
+    "check": "npx rome check ."
+  },
+  "keywords": [
+    "captions",
+    "transcript",
+    "cart"
+  ],
+  "author": "Derek Kaser",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@babel/core": "^7.22.9",
+    "@babel/preset-env": "^7.22.9",
+    "@babel/preset-react": "^7.22.5",
+    "babel-loader": "^9.1.3",
+    "babel-plugin-direct-import": "^1.0.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "compression-webpack-plugin": "^10.0.0",
+    "html-webpack-plugin": "^5.5.3",
+    "rome": "^12.1.3",
+    "source-map-loader": "^4.0.1",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.5",
+    "@mui/icons-material": "^5.14.1",
+    "@mui/material": "^5.14.2",
+    "@speechly/speech-recognition-polyfill": "^1.3.0",
+    "axios": "0.27.2",
+    "bad-words-next": "^2.2.1",
+    "css-loader": "^6.8.1",
+    "express": "^4.18.2",
+    "express-static-gzip": "^2.1.7",
+    "microsoft-cognitiveservices-speech-sdk": "^1.30.1",
+    "mui-image": "^1.0.7",
+    "nconf": "^0.12.0",
+    "node-polyfill-webpack-plugin": "^2.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-speech-recognition": "^3.10.0",
+    "regenerator-runtime": "^0.13.11",
+    "socket.io": "^4.7.1",
+    "socket.io-client": "^4.7.1",
+    "style-loader": "^3.3.3",
+    "web-speech-cognitive-services": "^7.1.3"
+  },
+  "pkg": {
+    "targets": [
+      "node18-win-x64",
+      "node18-linuxstatic-x64",
+      "node18-macos-x64",
+      "node18-win-arm64",
+      "node18-linuxstatic-arm64",
+      "node18-macos-arm64"
+    ],
+    "assets": "webpack/**/*",
+    "outputPath": "dist"
+  }
+}

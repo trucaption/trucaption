@@ -1,0 +1,5 @@
+node_modules
+dist
+config.ini
+webpack
+.DS_Store
