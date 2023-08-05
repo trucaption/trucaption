@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest a new feature
+title: '[Feature]: '
+labels: ['feature']
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What would the feature do?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Are there other options that would help solve the problem?
+    validations:
+      required: false
+  - type: textarea
+    id: comments
+    attributes:
+      label: Additional comments
+      description: Is there any other information that would help with this request?
+    validations:
+      required: false
+

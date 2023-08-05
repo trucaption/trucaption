@@ -1,0 +1,34 @@
+name: Enhancement request
+description: Suggest an improvement to existing features
+title: '[Enhancement]: '
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Behavior
+      description: What does the application currently do?
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Desired Behavior
+      description: What would you like the application to do?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Are there other options that would help solve the problem?
+    validations:
+      required: false
+  - type: textarea
+    id: comments
+    attributes:
+      label: Additional comments
+      description: Is there any other information that would help with this request?
+    validations:
+      required: false
+

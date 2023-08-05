@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a problem with the software
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Description
+      description: What happened?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Which version of the software were you using?
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Browsers
+      description: What browsers are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+        - Other
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: How can be behavior be recreated?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Tip: You can attach screenshots by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
