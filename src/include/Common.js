@@ -7,10 +7,21 @@
 const { createTheme } = require("@mui/material/styles");
 const CmgSansWoff2 = require("./CMGSans-Regular.woff2");
 
-const CONSTANTS = {
-  DEFAULT_TOPIC: "cart",
-  DEFAULT_FONT_SIZE: 60,
-};
+async function getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines) {
+  const response = await SERVER_CLIENT.get("/defaults");
+
+  setMaxLines(response.data.max_lines);
+
+  if (searchParams.has("size")) {
+    const fixedSize = searchParams.get("size");
+    if (!isNaN(fixedSize)) {
+      console.log("Setting fixed size");
+      setSize(fixedSize);
+    }
+  } else {
+    setSize(response.data.font_size);
+  }
+}
 
 const baseTheme = createTheme({
   palette: {
@@ -63,9 +74,22 @@ function autoScroll(endRef) {
   }
 }
 
+function trimTranscript(oldValues, newValues, maxLines) {
+  const lastLine = Object.keys(oldValues).pop() - maxLines;
+
+  const oldValuesTrimmed = oldValues;
+
+  Object.keys(oldValuesTrimmed).forEach((key) => {
+    if (key < lastLine) delete oldValuesTrimmed[key];
+  });
+
+  return { ...oldValuesTrimmed, ...newValues };
+}
+
 module.exports = {
-  CONSTANTS,
   baseTheme,
   getDisplayTheme,
   autoScroll,
+  trimTranscript,
+  getSettings,
 };

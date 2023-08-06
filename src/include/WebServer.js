@@ -29,6 +29,15 @@ function runWebServer(DIST_DIR, port, localOnly = false) {
   return { AppServer: app, HttpServer: http };
 }
 
+function sendDefaults(response, config) {
+  response.send({
+    topic: config.get("topic"),
+    font_size: parseInt(config.get("font_size")),
+    max_lines: parseInt(config.get("max_lines")),
+  });
+}
+
 module.exports = {
   runWebServer,
+  sendDefaults,
 };

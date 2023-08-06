@@ -26,19 +26,29 @@ import { ThemeProvider } from "@mui/material/styles";
 import Logo from "./assets/logo.png";
 import Image from "mui-image";
 
+import axios from "axios";
+
 import {
-  CONSTANTS,
   autoScroll,
   baseTheme,
   getDisplayTheme,
+  getSettings,
+  trimTranscript,
 } from "./include/Common";
+
+const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
+
+const SERVER_CLIENT = axios.create({
+  baseURL: SERVER_ADDRESS,
+});
 
 const Client = () => {
   const [tempTranscript, setTempTranscript] = useState("Loading...");
   const [transcript, setTranscript] = useState(new Object());
-  const [size, setSize] = useState(CONSTANTS.DEFAULT_FONT_SIZE);
-  const [room, setRoom] = useState(CONSTANTS.DEFAULT_ROOM);
+  const [size, setSize] = useState(20);
+  const [room, setRoom] = useState("");
   const [open, setOpen] = useState(false);
+  const [maxLines, setMaxLines] = useState(-1);
 
   const searchParams = new URLSearchParams(document.location.search);
   const noSidebar = searchParams.has("fullscreen");
@@ -46,16 +56,6 @@ const Client = () => {
   const drawerWidth = 240;
 
   if (searchParams.has("room")) setRoom(searchParams.get("room"));
-
-  useEffect(() => {
-    if (searchParams.has("size")) {
-      const fixedSize = searchParams.get("size");
-      if (!isNaN(fixedSize)) {
-        console.log("Setting fixed size");
-        setSize(fixedSize);
-      }
-    }
-  }, []);
 
   const endRef = useRef(null);
   useEffect(() => {
@@ -67,14 +67,16 @@ const Client = () => {
 
     const lineChange = {};
     lineChange[line] = text;
-    setTranscript((prev) => {
-      return { ...prev, ...lineChange };
-    });
+    setTranscript((prev) => trimTranscript(prev, lineChange, maxLines));
   }
 
   function onReset(message) {
     setTranscript(new Object());
     setTempTranscript("");
+  }
+
+  function onLines(lines) {
+    setMaxLines(lines);
   }
 
   function onConnect() {
@@ -99,6 +101,7 @@ const Client = () => {
     socket.on("final", (arg) => onFinal(arg));
     socket.on("temp", (arg) => setTempTranscript(arg));
     socket.on("reset", (arg) => onReset(arg));
+    socket.on("config", onLines());
 
     while (!socket.connected) {
       console.log("Attempting connection.");
@@ -107,8 +110,9 @@ const Client = () => {
     }
   }
 
-  // Initialize socket
+  // Load page
   useEffect(() => {
+    getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
     initializeSocket();
   }, []);
 

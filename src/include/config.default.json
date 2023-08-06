@@ -4,5 +4,8 @@
   "client_port": 80,
   "azure_subscription_key": "",
   "azure_region": "",
-  "speechly_app": ""
+  "speechly_app": "",
+  "topic": "",
+  "font_size": 20,
+  "max_lines": -1
 }

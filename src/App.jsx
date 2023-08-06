@@ -44,10 +44,11 @@ import Logo from "./assets/logo.png";
 import Image from "mui-image";
 
 import {
-  CONSTANTS,
   autoScroll,
   baseTheme,
   getDisplayTheme,
+  getSettings,
+  trimTranscript,
 } from "./include/Common";
 
 const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
@@ -58,8 +59,9 @@ const SERVER_CLIENT = axios.create({
 });
 
 const App = () => {
-  const [size, setSize] = useState(CONSTANTS.DEFAULT_FONT_SIZE);
-  const [room, setRoom] = useState(CONSTANTS.DEFAULT_ROOM);
+  const [size, setSize] = useState(20);
+  const [room, setRoom] = useState("");
+  const [maxLines, setMaxLines] = useState(-1);
 
   const [useFilter, setUseFilter] = useState(true);
   const [useCaps, setUseCaps] = useState(false);
@@ -75,6 +77,7 @@ const App = () => {
   const [sentTranscript, setSentTranscript] = useState(new Object());
 
   const badwords = new BadWordsNext({ data: en });
+  const searchParams = new URLSearchParams(document.location.search);
 
   const {
     finalTranscript,
@@ -102,14 +105,10 @@ const App = () => {
     const lineChange = {};
 
     lineChange[lineNumber] = text;
-    setTranscript((prev) => {
-      return { ...prev, ...lineChange };
-    });
+    setTranscript((prev) => trimTranscript(prev, lineChange, maxLines));
     if (send) {
       sendMessage(JSON.stringify({ line: lineNumber, text: text }));
-      setSentTranscript((prev) => {
-        return { ...prev, ...lineChange };
-      });
+      setSentTranscript((prev) => trimTranscript(prev, lineChange, maxLines));
     }
   }
 
@@ -252,6 +251,11 @@ const App = () => {
     setLoggedIn(true);
     sendMessage("", "reset");
   }
+
+  // Load page
+  useEffect(() => {
+    getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
+  }, []);
 
   return (
     <ThemeProvider theme={baseTheme}>

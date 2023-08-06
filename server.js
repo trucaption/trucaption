@@ -11,7 +11,7 @@ const { urlencoded } = require("body-parser");
 const { Server } = require("socket.io");
 
 const DEFAULT_CONFIG = require("./src/include/config.default.json");
-const { runWebServer } = require("./src/include/WebServer");
+const { runWebServer, sendDefaults } = require("./src/include/WebServer");
 
 const path = require("path");
 const nconf = require("nconf");
@@ -21,6 +21,7 @@ const configPath = path.join(process.cwd(), "config.ini");
 nconf
   .argv()
   .env({
+    parseValues: true,
     transform: function (obj) {
       if (!obj.key.toLowerCase().startsWith("trucaption_")) return false;
 
@@ -32,7 +33,7 @@ nconf
   .file({ file: configPath, format: nconf.formats.ini })
   .defaults(DEFAULT_CONFIG);
 
-const { HttpServer: clientHttp } = runWebServer(
+const { AppServer: clientApp, HttpServer: clientHttp } = runWebServer(
   path.join(__dirname, "webpack/client"),
   nconf.get("client_port"),
 );
@@ -40,6 +41,14 @@ const { AppServer: controllerApp } = runWebServer(
   path.join(__dirname, "webpack/controller"),
   nconf.get("controller_port"),
   true,
+);
+
+// Set up defaults
+controllerApp.get("/defaults", (request, response) =>
+  sendDefaults(response, nconf),
+);
+clientApp.get("/defaults", (request, response) =>
+  sendDefaults(response, nconf),
 );
 
 // Set up client socket
