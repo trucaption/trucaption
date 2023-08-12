@@ -16,6 +16,8 @@ const { runWebServer, sendDefaults } = require("./src/include/WebServer");
 const path = require("path");
 const nconf = require("nconf");
 
+const ip = require("ip");
+
 // Get configuration:
 const configPath = path.join(process.cwd(), "config.ini");
 nconf
@@ -79,6 +81,8 @@ controllerApp.get("/config", async (request, response) => {
 
   response.send({
     api: api,
+    server_ip: ip.address(),
+    client_port: nconf.get("client_port"),
     clear_temp_on_stop: nconf.get("clear_temp_on_stop"),
     azure_token: api === "azure" ? azureToken : "",
     azure_region: api === "azure" ? nconf.get("azure_region") : "",

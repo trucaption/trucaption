@@ -21,6 +21,7 @@ import KeyboardCapslockIcon from "@mui/icons-material/KeyboardCapslock";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import versionCheck from "@version-checker/browser";
 
@@ -69,9 +70,10 @@ const App = () => {
   const [maxLines, setMaxLines] = useState(-1);
   const [updateState, setUpdateState] = useState("Unknown");
 
+  const [config, setConfig] = useState(null);
+
   const [useFilter, setUseFilter] = useState(true);
   const [useCaps, setUseCaps] = useState(false);
-  const [clearTemp, setClearTemp] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [wantListen, setWantListen] = useState(false);
@@ -203,7 +205,7 @@ const App = () => {
     setWantListen(false);
     SpeechRecognition.abortListening();
 
-    if (!clearTemp) {
+    if (!config.clear_temp_on_stop) {
       setLine(line + 1);
 
       updateTranscript(line, applyTextEffects(interimTranscript));
@@ -241,7 +243,7 @@ const App = () => {
     }
 
     console.debug(response);
-    setClearTemp(response.data.clear_temp_on_stop);
+    setConfig(response.data);
 
     switch (response.data.api) {
       case "azure": {
@@ -281,6 +283,10 @@ const App = () => {
 
     setLoggedIn(true);
     sendMessage("", "reset");
+  }
+
+  function openClient() {
+    window.open(`http://${config.server_ip}:${config.client_port}/`);
   }
 
   // Load page
@@ -435,6 +441,17 @@ const App = () => {
           </List>
           <Divider />
           <List>
+            <ListItem key="OpenClient" disablePadding>
+              <ListItemButton
+                disabled={!loggedIn || !browserSupportsSpeechRecognition}
+                onClick={openClient}
+              >
+                <ListItemIcon>
+                  <OpenInNewIcon />
+                </ListItemIcon>
+                <ListItemText>Open Viewer</ListItemText>
+              </ListItemButton>
+            </ListItem>
             <ListItem key="Download" disablePadding>
               <ListItemButton
                 disabled={!loggedIn || !browserSupportsSpeechRecognition}
