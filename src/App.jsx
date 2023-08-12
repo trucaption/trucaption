@@ -16,12 +16,15 @@ import BadWordsNext from "bad-words-next";
 import en from "bad-words-next/data/en.json";
 
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import DownloadIcon from "@mui/icons-material/Download";
 import KeyboardCapslockIcon from "@mui/icons-material/KeyboardCapslock";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 
 import versionCheck from "@version-checker/browser";
+
+import fileDownload from "js-file-download";
 
 import {
   Box,
@@ -116,7 +119,9 @@ const App = () => {
     setTranscript((prev) => trimTranscript(prev, lineChange, maxLines));
     if (send) {
       sendMessage(JSON.stringify({ line: lineNumber, text: text }));
-      setSentTranscript((prev) => trimTranscript(prev, lineChange, maxLines));
+      setSentTranscript((prev) => {
+        return { ...prev, ...lineChange };
+      });
     }
   }
 
@@ -170,6 +175,10 @@ const App = () => {
       setTempTranscript(cleanTranscript);
       sendMessage(cleanTranscript, "temp");
     }
+  }
+
+  function downloadTranscript() {
+    fileDownload(Object.values(sentTranscript).join("\n"), "transcript.txt");
   }
 
   useEffect(onFinalTranscript, [finalTranscript]);
@@ -408,6 +417,20 @@ const App = () => {
                   setSize(newValue);
                 }}
               />
+            </ListItem>
+          </List>
+          <Divider />
+          <List>
+            <ListItem key="Download" disablePadding>
+              <ListItemButton
+                disabled={!loggedIn || !browserSupportsSpeechRecognition}
+                onClick={downloadTranscript}
+              >
+                <ListItemIcon>
+                  <DownloadIcon />
+                </ListItemIcon>
+                <ListItemText>Download</ListItemText>
+              </ListItemButton>
             </ListItem>
           </List>
           <Divider />
