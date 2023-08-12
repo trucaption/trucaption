@@ -16,6 +16,8 @@ const { runWebServer, sendDefaults } = require("./src/include/WebServer");
 const path = require("path");
 const nconf = require("nconf");
 
+const open = require("open");
+
 const ip = require("ip");
 
 // Get configuration:
@@ -101,6 +103,4 @@ controllerApp.post("/message", (request, response) => {
   }
 });
 
-import("open").then((open) => {
-  open.default("http://localhost:8080");
-});
+open("http://localhost:8080");
