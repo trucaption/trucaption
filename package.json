@@ -45,6 +45,7 @@
     "@mui/icons-material": "^5.14.1",
     "@mui/material": "^5.14.2",
     "@speechly/speech-recognition-polyfill": "^1.3.0",
+    "@version-checker/browser": "^3.1.0",
     "axios": "0.27.2",
     "bad-words-next": "^2.2.1",
     "css-loader": "^6.8.1",

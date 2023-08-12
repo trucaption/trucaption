@@ -19,6 +19,9 @@ const controllerConfig = {
     new CompressionPlugin({
       deleteOriginalAssets: true,
     }),
+    new webpack.DefinePlugin({
+      VERSION: JSON.stringify(require("./package.json").version),
+    }),
   ],
   module: {
     rules: [

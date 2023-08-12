@@ -21,6 +21,8 @@ import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 
+import versionCheck from "@version-checker/browser";
+
 import {
   Box,
   CssBaseline,
@@ -62,12 +64,12 @@ const App = () => {
   const [size, setSize] = useState(20);
   const [room, setRoom] = useState("");
   const [maxLines, setMaxLines] = useState(-1);
+  const [updateState, setUpdateState] = useState("Unknown");
 
   const [useFilter, setUseFilter] = useState(true);
   const [useCaps, setUseCaps] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
-
   const [wantListen, setWantListen] = useState(false);
 
   const [tempTranscript, setTempTranscript] = useState("");
@@ -86,6 +88,12 @@ const App = () => {
     resetTranscript,
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
+
+  const versionOptions = {
+    repo: "trucaption",
+    owner: "dkaser",
+    currentVersion: VERSION,
+  };
 
   function sendMessage(message, messageType = "final") {
     try {
@@ -255,6 +263,22 @@ const App = () => {
   // Load page
   useEffect(() => {
     getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
+    versionCheck(versionOptions, function (error, update) {
+      if (error) {
+        console.log(error);
+        return;
+      }
+
+      console.debug(update);
+
+      if (update.update) {
+        console.log(`An update is available: ${update.update.name}`);
+        setUpdateState("Available");
+      } else {
+        console.log("Version is current");
+        setUpdateState("Not Available");
+      }
+    });
   }, []);
 
   return (
@@ -384,6 +408,15 @@ const App = () => {
                   setSize(newValue);
                 }}
               />
+            </ListItem>
+          </List>
+          <Divider />
+          <List>
+            <ListItem>
+              <ListItemText primaryTypographyProps={{ fontSize: "0.5em" }}>
+                Version: {VERSION} <br />
+                Update: {updateState}
+              </ListItemText>
             </ListItem>
           </List>
         </Drawer>
