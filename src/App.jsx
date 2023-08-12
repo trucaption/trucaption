@@ -210,6 +210,8 @@ const App = () => {
 
     setTranscript(new Object());
     setTempTranscript("");
+    setSentTranscript(new Object());
+    setSentLength(0);
 
     sendMessage("", "reset");
 
