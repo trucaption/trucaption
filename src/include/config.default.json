@@ -7,5 +7,6 @@
   "speechly_app": "",
   "topic": "",
   "font_size": 20,
-  "max_lines": -1
+  "max_lines": -1,
+  "clear_temp_on_stop": false
 }

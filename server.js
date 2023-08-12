@@ -79,6 +79,7 @@ controllerApp.get("/config", async (request, response) => {
 
   response.send({
     api: api,
+    clear_temp_on_stop: nconf.get("clear_temp_on_stop"),
     azure_token: api === "azure" ? azureToken : "",
     azure_region: api === "azure" ? nconf.get("azure_region") : "",
     speechly_app: api === "speechly" ? nconf.get("speechly_app") : "",

@@ -71,6 +71,7 @@ const App = () => {
 
   const [useFilter, setUseFilter] = useState(true);
   const [useCaps, setUseCaps] = useState(false);
+  const [clearTemp, setClearTemp] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [wantListen, setWantListen] = useState(false);
@@ -201,6 +202,14 @@ const App = () => {
   function stopListening() {
     setWantListen(false);
     SpeechRecognition.abortListening();
+
+    if (!clearTemp) {
+      setLine(line + 1);
+
+      updateTranscript(line, applyTextEffects(interimTranscript));
+    }
+
+    setTempTranscript("");
   }
 
   async function resetScreen() {
@@ -230,6 +239,9 @@ const App = () => {
       alert("Login failed.");
       return null;
     }
+
+    console.debug(response);
+    setClearTemp(response.data.clear_temp_on_stop);
 
     switch (response.data.api) {
       case "azure": {
