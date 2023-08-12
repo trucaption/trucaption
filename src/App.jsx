@@ -289,9 +289,8 @@ const App = () => {
     window.open(`http://${config.server_ip}:${config.client_port}/`);
   }
 
-  // Load page
-  useEffect(() => {
-    getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
+  async function loadPage() {
+    await getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
     versionCheck(versionOptions, function (error, update) {
       if (error) {
         console.log(error);
@@ -308,6 +307,11 @@ const App = () => {
         setUpdateState("Not Available");
       }
     });
+  }
+
+  // Load page
+  useEffect(() => {
+    loadPage();
   }, []);
 
   return (

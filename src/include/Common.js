@@ -10,6 +10,9 @@ const CmgSansWoff2 = require("./CMGSans-Regular.woff2");
 async function getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines) {
   const response = await SERVER_CLIENT.get("/defaults");
 
+  console.debug("Received configuration data:");
+  console.debug(response.data);
+
   setMaxLines(response.data.max_lines);
 
   if (searchParams.has("size")) {
@@ -79,9 +82,16 @@ function trimTranscript(oldValues, newValues, maxLines) {
 
   const oldValuesTrimmed = oldValues;
 
-  Object.keys(oldValuesTrimmed).forEach((key) => {
-    if (key < lastLine) delete oldValuesTrimmed[key];
-  });
+  if (maxLines >= 0) {
+    Object.keys(oldValuesTrimmed).forEach((key) => {
+      if (key < lastLine) {
+        console.debug(
+          `Removing line: ${key}, lastLine is ${lastLine}, maxLines is ${maxLines}`,
+        );
+        delete oldValuesTrimmed[key];
+      }
+    });
+  }
 
   return { ...oldValuesTrimmed, ...newValues };
 }

@@ -48,7 +48,7 @@ const Client = () => {
   const [size, setSize] = useState(20);
   const [room, setRoom] = useState("");
   const [open, setOpen] = useState(false);
-  const [maxLines, setMaxLines] = useState(-1);
+  const [maxLines, setMaxLines] = useState(null);
 
   const searchParams = new URLSearchParams(document.location.search);
   const noSidebar = searchParams.has("fullscreen");
@@ -62,7 +62,7 @@ const Client = () => {
     autoScroll(endRef);
   });
 
-  function onFinal(message) {
+  function onFinal(message, maxLines) {
     const { line, text } = JSON.parse(message);
 
     const lineChange = {};
@@ -98,7 +98,7 @@ const Client = () => {
     socket.on("connect", onConnect);
     socket.on("connect_error", () => console.log("Connection error."));
 
-    socket.on("final", (arg) => onFinal(arg));
+    socket.on("final", (arg) => onFinal(arg, maxLines));
     socket.on("temp", (arg) => setTempTranscript(arg));
     socket.on("reset", (arg) => onReset(arg));
     socket.on("config", onLines());
@@ -110,11 +110,20 @@ const Client = () => {
     }
   }
 
+  async function loadPage() {
+    getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
+  }
+
   // Load page
   useEffect(() => {
-    getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
-    initializeSocket();
+    loadPage();
   }, []);
+
+  useEffect(() => {
+    if (maxLines !== null) {
+      initializeSocket();
+    }
+  }, [maxLines]);
 
   function Sidebar() {
     if (noSidebar) return null;
