@@ -24,6 +24,11 @@
 # azure_subscription_key = 
 # azure_region = 
 
+; Endpoint ID for Azure custom speech endpoints
+; Make sure that azure_subscription_key is set to the resource key for the
+; endpoint if custom speech is being used.
+# azure_endpoint_id =
+
 ; Speechly API settings
 
 # speechly_app = 

@@ -256,6 +256,7 @@ const App = () => {
               region: response.data.azure_region,
               authorizationToken: response.data.azure_token,
             },
+            speechRecognitionEndpointId: response.data.azure_endpoint_id ? response.data.azure_endpoint_id : undefined,
           });
         SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
         setUseCaps(false);

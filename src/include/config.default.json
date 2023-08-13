@@ -8,5 +8,6 @@
   "topic": "",
   "font_size": 20,
   "max_lines": -1,
-  "clear_temp_on_stop": false
+  "clear_temp_on_stop": false,
+  "azure_endpoint_id": null
 }

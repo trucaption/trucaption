@@ -88,6 +88,7 @@ controllerApp.get("/config", async (request, response) => {
     clear_temp_on_stop: nconf.get("clear_temp_on_stop"),
     azure_token: api === "azure" ? azureToken : "",
     azure_region: api === "azure" ? nconf.get("azure_region") : "",
+    azure_endpoint_id: api === "azure" ? nconf.get("azure_endpoint_id") : "",
     speechly_app: api === "speechly" ? nconf.get("speechly_app") : "",
   });
 });
