@@ -13,7 +13,7 @@
     "start": "node src/server.js",
     "format": "npx rome format --write .",
     "check": "npx rome check .",
-    "package": "ncc build ./src/server.js -o build && pkg build/index.js -C Brotli"
+    "package": "ncc build ./src/server.js -o build && pkg build/ -C Brotli"
   },
   "keywords": [
     "captions",
