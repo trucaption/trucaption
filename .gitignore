@@ -3,3 +3,5 @@ dist
 config.ini
 webpack
 .DS_Store
+build/*
+!build/package.json

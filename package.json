@@ -2,7 +2,7 @@
   "name": "trucaption",
   "version": "1.1.0",
   "description": "Computer-aided realtime transcription",
-  "bin": "server.js",
+  "bin": "src/server.js",
   "scripts": {
     "build:controller": "webpack --mode production --config controller.webpack.config.js",
     "build:client": "webpack --mode production --config client.webpack.config.js",
@@ -10,10 +10,10 @@
     "test": "npm run test:controller && npm run test:client && npm run start",
     "test:controller": "webpack --mode development --config controller.webpack.config.js",
     "test:client": "webpack --mode development --config client.webpack.config.js",
-    "start": "node server.js",
-    "package": "pkg . -C Brotli",
+    "start": "node src/server.js",
     "format": "npx rome format --write .",
-    "check": "npx rome check ."
+    "check": "npx rome check .",
+    "package": "ncc build ./src/server.js -o build && pkg build/index.js -C Brotli"
   },
   "keywords": [
     "captions",
@@ -74,7 +74,12 @@
       "node18-win-arm64",
       "node18-macos-arm64"
     ],
-    "assets": "webpack/**/*",
+    "assets": [
+        "build/client/**/*",
+        "build/client-dist/**/*",
+        "build/controller/**/*",
+        "build/xdg-open"
+      ],
     "outputPath": "dist"
   }
 }

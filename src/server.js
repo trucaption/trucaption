@@ -10,8 +10,8 @@ const { urlencoded } = require("body-parser");
 
 const { Server } = require("socket.io");
 
-const DEFAULT_CONFIG = require("./src/include/config.default.json");
-const { runWebServer, sendDefaults } = require("./src/include/WebServer");
+const DEFAULT_CONFIG = require("./include/config.default.json");
+const { runWebServer, sendDefaults } = require("./include/WebServer");
 
 const path = require("path");
 const nconf = require("nconf");
@@ -21,7 +21,7 @@ const open = require("open");
 const ip = require("ip");
 
 // Get configuration:
-const configPath = path.join(process.cwd(), "config.ini");
+const configPath = path.join(process.env.PWD, "config.ini");
 nconf
   .argv()
   .env({

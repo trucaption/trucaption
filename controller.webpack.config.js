@@ -8,7 +8,7 @@ const controllerConfig = {
   entry: ["regenerator-runtime/runtime.js", "./src/app-index.js"],
   output: {
     filename: "[name].[chunkhash].js",
-    path: path.resolve(__dirname, "webpack/controller"),
+    path: path.resolve(__dirname, "src/webpack/controller"),
   },
   plugins: [
     new HtmlWebpackPlugin({

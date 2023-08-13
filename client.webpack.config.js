@@ -8,7 +8,7 @@ const clientConfig = {
   entry: ["regenerator-runtime/runtime.js", "./src/client-index.js"],
   output: {
     filename: "[name].[chunkhash].js",
-    path: path.resolve(__dirname, "webpack/client"),
+    path: path.resolve(__dirname, "src/webpack/client"),
   },
   plugins: [
     new HtmlWebpackPlugin({
