@@ -1,0 +1,39 @@
+{
+  "name": "@trucaption/web",
+  "version": "1.2.0",
+  "description": "Computer-aided realtime transcription",
+  "scripts": {
+    "build": "npm run check && webpack --mode production",
+    "test": "webpack --mode development",
+    "format": "npx rome format --write .",
+    "check": "npx rome check ."
+  },
+  "author": "Derek Kaser",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.14.3",
+    "@mui/material": "^5.14.5",
+    "axios": "^1.4.0",
+    "css-loader": "^6.8.1",
+    "mui-image": "^1.0.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "regenerator-runtime": "^0.14.0",
+    "socket.io-client": "^4.7.2",
+    "style-loader": "^3.3.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.10",
+    "@babel/preset-env": "^7.22.10",
+    "@babel/preset-react": "^7.22.5",
+    "babel-loader": "^9.1.3",
+    "babel-plugin-direct-import": "^1.0.0",
+    "compression-webpack-plugin": "^10.0.0",
+    "html-webpack-plugin": "^5.5.3",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}

@@ -4,9 +4,9 @@
     @license GPL-3.0-or-later
 */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import MenuIcon from "@mui/icons-material/Menu";
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   Box,
   CssBaseline,
@@ -20,13 +20,13 @@ import {
   ListItemText,
   Slider,
   Typography,
-} from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
+} from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
 
-import Logo from "./assets/logo.png";
-import Image from "mui-image";
+import Logo from '../assets/logo.png';
+import Image from 'mui-image';
 
-import axios from "axios";
+import axios from 'axios';
 
 import {
   autoScroll,
@@ -34,7 +34,7 @@ import {
   getDisplayTheme,
   getSettings,
   trimTranscript,
-} from "./include/Common";
+} from './Common.mjs';
 
 const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
 
@@ -42,20 +42,20 @@ const SERVER_CLIENT = axios.create({
   baseURL: SERVER_ADDRESS,
 });
 
-const Client = () => {
-  const [tempTranscript, setTempTranscript] = useState("Loading...");
+export default function Viewer() {
+  const [tempTranscript, setTempTranscript] = useState('Loading...');
   const [transcript, setTranscript] = useState(new Object());
   const [size, setSize] = useState(20);
-  const [room, setRoom] = useState("");
+  const [room, setRoom] = useState('');
   const [open, setOpen] = useState(false);
   const [maxLines, setMaxLines] = useState(null);
 
   const searchParams = new URLSearchParams(document.location.search);
-  const noSidebar = searchParams.has("fullscreen");
+  const noSidebar = searchParams.has('fullscreen');
 
   const drawerWidth = 240;
 
-  if (searchParams.has("room")) setRoom(searchParams.get("room"));
+  if (searchParams.has('room')) setRoom(searchParams.get('room'));
 
   const endRef = useRef(null);
   useEffect(() => {
@@ -72,7 +72,7 @@ const Client = () => {
 
   function onReset(message) {
     setTranscript(new Object());
-    setTempTranscript("");
+    setTempTranscript('');
   }
 
   function onLines(lines) {
@@ -80,8 +80,8 @@ const Client = () => {
   }
 
   function onConnect() {
-    console.log("Connected.");
-    setTempTranscript("");
+    console.log('Connected.');
+    setTempTranscript('');
   }
 
   function toggleSidebar() {
@@ -89,22 +89,22 @@ const Client = () => {
   }
 
   async function initializeSocket() {
-    const { io } = await import("socket.io-client");
+    const { io } = await import('socket.io-client');
 
     const socket = io(`/${room}`, {
       autoConnect: false,
     });
 
-    socket.on("connect", onConnect);
-    socket.on("connect_error", () => console.log("Connection error."));
+    socket.on('connect', onConnect);
+    socket.on('connect_error', () => console.log('Connection error.'));
 
-    socket.on("final", (arg) => onFinal(arg, maxLines));
-    socket.on("temp", (arg) => setTempTranscript(arg));
-    socket.on("reset", (arg) => onReset(arg));
-    socket.on("config", onLines());
+    socket.on('final', (arg) => onFinal(arg, maxLines));
+    socket.on('temp', (arg) => setTempTranscript(arg));
+    socket.on('reset', (arg) => onReset(arg));
+    socket.on('config', onLines());
 
     while (!socket.connected) {
-      console.log("Attempting connection.");
+      console.log('Attempting connection.');
       socket.open();
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
@@ -132,9 +132,9 @@ const Client = () => {
       <>
         <Fab
           onClick={toggleSidebar}
-          style={{ position: "fixed", top: 16, right: 16 }}
+          style={{ position: 'fixed', top: 16, right: 16 }}
           size="medium"
-          sx={{ ...(open && { display: "none" }) }}
+          sx={{ ...(open && { display: 'none' }) }}
         >
           <MenuIcon />
         </Fab>
@@ -142,9 +142,9 @@ const Client = () => {
           sx={{
             width: drawerWidth,
             flexShrink: 0,
-            "& .MuiDrawer-paper": {
+            '& .MuiDrawer-paper': {
               width: drawerWidth,
-              boxSizing: "border-box",
+              boxSizing: 'border-box',
             },
           }}
           variant="persistent"
@@ -188,7 +188,7 @@ const Client = () => {
 
   return (
     <ThemeProvider theme={baseTheme}>
-      <Box sx={{ display: "flow" }}>
+      <Box sx={{ display: 'flow' }}>
         <CssBaseline />
         <Sidebar />
         <ThemeProvider theme={getDisplayTheme(size)}>
@@ -207,5 +207,4 @@ const Client = () => {
       </Box>
     </ThemeProvider>
   );
-};
-export default Client;
+}

@@ -4,28 +4,28 @@
     @license GPL-3.0-or-later
 */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 import SpeechRecognition, {
   useSpeechRecognition,
-} from "react-speech-recognition";
+} from 'react-speech-recognition';
 
-import axios from "axios";
+import axios from 'axios';
 
-import BadWordsNext from "bad-words-next";
-import en from "bad-words-next/data/en.json";
+import BadWordsNext from 'bad-words-next';
+import en from 'bad-words-next/data/en.json';
 
-import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
-import DownloadIcon from "@mui/icons-material/Download";
-import KeyboardCapslockIcon from "@mui/icons-material/KeyboardCapslock";
-import MicIcon from "@mui/icons-material/Mic";
-import MicOffIcon from "@mui/icons-material/MicOff";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import DownloadIcon from '@mui/icons-material/Download';
+import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
-import versionCheck from "@version-checker/browser";
+import versionCheck from '@version-checker/browser';
 
-import fileDownload from "js-file-download";
+import fileDownload from 'js-file-download';
 
 import {
   Box,
@@ -43,11 +43,11 @@ import {
   TextField,
   Toolbar,
   Typography,
-} from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
+} from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
 
-import Logo from "./assets/logo.png";
-import Image from "mui-image";
+import Logo from '../assets/logo.png';
+import Image from 'mui-image';
 
 import {
   autoScroll,
@@ -55,7 +55,7 @@ import {
   getDisplayTheme,
   getSettings,
   trimTranscript,
-} from "./include/Common";
+} from './Common.mjs';
 
 const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
 const drawerWidth = 240;
@@ -64,11 +64,11 @@ const SERVER_CLIENT = axios.create({
   baseURL: SERVER_ADDRESS,
 });
 
-const App = () => {
+export default function Editor() {
   const [size, setSize] = useState(20);
-  const [room, setRoom] = useState("");
+  const [room, setRoom] = useState('');
   const [maxLines, setMaxLines] = useState(-1);
-  const [updateState, setUpdateState] = useState("Unknown");
+  const [updateState, setUpdateState] = useState('Unknown');
 
   const [config, setConfig] = useState(null);
 
@@ -78,7 +78,7 @@ const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [wantListen, setWantListen] = useState(false);
 
-  const [tempTranscript, setTempTranscript] = useState("");
+  const [tempTranscript, setTempTranscript] = useState('');
   const [sentLength, setSentLength] = useState(0);
   const [line, setLine] = useState(1);
   const [transcript, setTranscript] = useState(new Object());
@@ -96,12 +96,12 @@ const App = () => {
   } = useSpeechRecognition();
 
   const versionOptions = {
-    repo: "trucaption",
-    owner: "dkaser",
+    repo: 'trucaption',
+    owner: 'dkaser',
     currentVersion: VERSION,
   };
 
-  function sendMessage(message, messageType = "final") {
+  function sendMessage(message, messageType = 'final') {
     try {
       const payload = {
         room: room,
@@ -109,7 +109,7 @@ const App = () => {
         data: message,
       };
 
-      SERVER_CLIENT.post("/message", payload);
+      SERVER_CLIENT.post('/message', payload);
     } catch (error) {
       console.log(`Error sending message: ${error}`);
     }
@@ -129,7 +129,7 @@ const App = () => {
   }
 
   function handleChange(e) {
-    if (typeof e.target.name !== "undefined") {
+    if (typeof e.target.name !== 'undefined') {
       updateTranscript(e.target.name, e.target.value, false);
     }
   }
@@ -145,11 +145,11 @@ const App = () => {
 
   function onKeyDown(data) {
     switch (data.key) {
-      case "Escape":
+      case 'Escape':
         data.target.value = sentTranscript[data.target.name];
         document.activeElement.blur();
         break;
-      case "Enter":
+      case 'Enter':
         document.activeElement.blur();
         break;
     }
@@ -165,7 +165,7 @@ const App = () => {
 
       updateTranscript(
         line,
-        applyTextEffects(finalTranscript.substring(sentLength)),
+        applyTextEffects(finalTranscript.substring(sentLength))
       );
       setSentLength(finalTranscript.length);
     }
@@ -176,12 +176,12 @@ const App = () => {
       const cleanTranscript = applyTextEffects(interimTranscript);
 
       setTempTranscript(cleanTranscript);
-      sendMessage(cleanTranscript, "temp");
+      sendMessage(cleanTranscript, 'temp');
     }
   }
 
   function downloadTranscript() {
-    fileDownload(Object.values(sentTranscript).join("\n"), "transcript.txt");
+    fileDownload(Object.values(sentTranscript).join('\n'), 'transcript.txt');
   }
 
   useEffect(onFinalTranscript, [finalTranscript]);
@@ -197,7 +197,7 @@ const App = () => {
 
     SpeechRecognition.startListening({
       continuous: true,
-      language: "en-US",
+      language: 'en-US',
     });
   }
 
@@ -211,7 +211,7 @@ const App = () => {
       updateTranscript(line, applyTextEffects(interimTranscript));
     }
 
-    setTempTranscript("");
+    setTempTranscript('');
   }
 
   async function resetScreen() {
@@ -220,11 +220,11 @@ const App = () => {
     resetTranscript();
 
     setTranscript(new Object());
-    setTempTranscript("");
+    setTempTranscript('');
     setSentTranscript(new Object());
     setSentLength(0);
 
-    sendMessage("", "reset");
+    sendMessage('', 'reset');
 
     await login();
     if (wantListen) startListening();
@@ -233,12 +233,12 @@ const App = () => {
   async function login() {
     let response;
     try {
-      response = await SERVER_CLIENT.get("/config", {
+      response = await SERVER_CLIENT.get('/config', {
         params: { room: room },
       });
     } catch (error) {
       console.log(error);
-      alert("Login failed.");
+      alert('Login failed.');
       return null;
     }
 
@@ -246,9 +246,9 @@ const App = () => {
     setConfig(response.data);
 
     switch (response.data.api) {
-      case "azure": {
+      case 'azure': {
         const { default: createSpeechServicesPonyfill } = await import(
-          "web-speech-cognitive-services"
+          'web-speech-cognitive-services'
         );
         const { SpeechRecognition: AzureSpeechRecognition } =
           createSpeechServicesPonyfill({
@@ -256,25 +256,27 @@ const App = () => {
               region: response.data.azure_region,
               authorizationToken: response.data.azure_token,
             },
-            speechRecognitionEndpointId: response.data.azure_endpoint_id ? response.data.azure_endpoint_id : undefined,
+            speechRecognitionEndpointId: response.data.azure_endpoint_id
+              ? response.data.azure_endpoint_id
+              : undefined,
           });
         SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
         setUseCaps(false);
-        console.log("Initialized Azure Speech Services");
+        console.log('Initialized Azure Speech Services');
         break;
       }
 
-      case "speechly": {
+      case 'speechly': {
         const { createSpeechlySpeechRecognition } = await import(
-          "@speechly/speech-recognition-polyfill"
+          '@speechly/speech-recognition-polyfill'
         );
 
         const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
-          response.data.speechly_app,
+          response.data.speechly_app
         );
         SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
         setUseCaps(true);
-        console.log("Initialized Speechly");
+        console.log('Initialized Speechly');
         break;
       }
 
@@ -283,7 +285,7 @@ const App = () => {
     }
 
     setLoggedIn(true);
-    sendMessage("", "reset");
+    sendMessage('', 'reset');
   }
 
   function openClient() {
@@ -302,10 +304,10 @@ const App = () => {
 
       if (update.update) {
         console.log(`An update is available: ${update.update.name}`);
-        setUpdateState("Available");
+        setUpdateState('Available');
       } else {
-        console.log("Version is current");
-        setUpdateState("Not Available");
+        console.log('Version is current');
+        setUpdateState('Not Available');
       }
     });
   }
@@ -317,15 +319,15 @@ const App = () => {
 
   return (
     <ThemeProvider theme={baseTheme}>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <Drawer
           sx={{
             width: drawerWidth,
             flexShrink: 0,
-            "& .MuiDrawer-paper": {
+            '& .MuiDrawer-paper': {
               width: drawerWidth,
-              boxSizing: "border-box",
+              boxSizing: 'border-box',
             },
           }}
           variant="permanent"
@@ -353,9 +355,9 @@ const App = () => {
                 {listening ? <MicIcon /> : <MicOffIcon />}
               </ListItemIcon>
               <ListItemText
-                primaryTypographyProps={{ color: listening ? "red" : "green" }}
+                primaryTypographyProps={{ color: listening ? 'red' : 'green' }}
               >
-                Microphone {listening ? "on" : "off"}
+                Microphone {listening ? 'on' : 'off'}
               </ListItemText>
             </ListItem>
           </List>
@@ -472,7 +474,7 @@ const App = () => {
           <Divider />
           <List>
             <ListItem>
-              <ListItemText primaryTypographyProps={{ fontSize: "0.5em" }}>
+              <ListItemText primaryTypographyProps={{ fontSize: '0.5em' }}>
                 Version: {VERSION} <br />
                 Update: {updateState}
               </ListItemText>
@@ -481,7 +483,7 @@ const App = () => {
         </Drawer>
         <Box
           component="main"
-          sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+          sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
         >
           <Toolbar />
           <ThemeProvider theme={getDisplayTheme(size)}>
@@ -513,5 +515,4 @@ const App = () => {
       </Box>
     </ThemeProvider>
   );
-};
-export default App;
+}

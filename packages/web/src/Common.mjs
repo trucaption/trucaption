@@ -4,21 +4,26 @@
     @license GPL-3.0-or-later
 */
 
-const { createTheme } = require("@mui/material/styles");
-const CmgSansWoff2 = require("./CMGSans-Regular.woff2");
+import CmgSansWoff2 from '../assets/CMGSans-Regular.woff2';
+import { createTheme } from '@mui/material/styles/index.js';
 
-async function getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines) {
-  const response = await SERVER_CLIENT.get("/defaults");
+export async function getSettings(
+  SERVER_CLIENT,
+  searchParams,
+  setSize,
+  setMaxLines
+) {
+  const response = await SERVER_CLIENT.get('/defaults');
 
-  console.debug("Received configuration data:");
+  console.debug('Received configuration data:');
   console.debug(response.data);
 
   setMaxLines(response.data.max_lines);
 
-  if (searchParams.has("size")) {
-    const fixedSize = searchParams.get("size");
+  if (searchParams.has('size')) {
+    const fixedSize = searchParams.get('size');
     if (!isNaN(fixedSize)) {
-      console.log("Setting fixed size");
+      console.log('Setting fixed size');
       setSize(fixedSize);
     }
   } else {
@@ -26,9 +31,9 @@ async function getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines) {
   }
 }
 
-const baseTheme = createTheme({
+export const baseTheme = createTheme({
   palette: {
-    mode: "dark",
+    mode: 'dark',
   },
   components: {
     MuiCssBaseline: {
@@ -45,23 +50,23 @@ const baseTheme = createTheme({
   },
 });
 
-function getDisplayTheme(size) {
+export function getDisplayTheme(size) {
   return createTheme({
     palette: {
-      mode: "dark",
+      mode: 'dark',
     },
     typography: {
       fontSize: size,
-      fontFamily: "CMG Sans, Roboto",
+      fontFamily: 'CMG Sans, Roboto',
     },
     components: {
       MuiInput: {
         styleOverrides: {
           root: ({ ownerState, theme }) => ({
-            "&.Mui-focused": {
+            '&.Mui-focused': {
               backgroundColor: theme.palette.action.selected,
             },
-            "&:hover:not(.Mui-focused)": {
+            '&:hover:not(.Mui-focused)': {
               backgroundColor: theme.palette.action.hover,
             },
           }),
@@ -71,13 +76,13 @@ function getDisplayTheme(size) {
   });
 }
 
-function autoScroll(endRef) {
+export function autoScroll(endRef) {
   if (endRef.current) {
-    endRef.current.scrollIntoView({ behavior: "smooth" });
+    endRef.current.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
-function trimTranscript(oldValues, newValues, maxLines) {
+export function trimTranscript(oldValues, newValues, maxLines) {
   const finalValues = { ...oldValues, ...newValues };
   const lastLine = Object.keys(finalValues).pop() - maxLines;
 
@@ -85,7 +90,7 @@ function trimTranscript(oldValues, newValues, maxLines) {
     Object.keys(finalValues).forEach((key) => {
       if (key <= lastLine) {
         console.debug(
-          `Removing line: ${key}, lastLine is ${lastLine}, maxLines is ${maxLines}`,
+          `Removing line: ${key}, lastLine is ${lastLine}, maxLines is ${maxLines}`
         );
         delete finalValues[key];
       }
@@ -94,11 +99,3 @@ function trimTranscript(oldValues, newValues, maxLines) {
 
   return finalValues;
 }
-
-module.exports = {
-  baseTheme,
-  getDisplayTheme,
-  autoScroll,
-  trimTranscript,
-  getSettings,
-};
