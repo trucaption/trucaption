@@ -24,7 +24,6 @@
     "express-static-gzip": "^2.1.7",
     "ip": "^1.1.8",
     "nconf": "^0.12.0",
-    "nconf-esm": "^0.0.6",
     "open": "^8.4.2",
     "socket.io": "^4.7.2"
   },
