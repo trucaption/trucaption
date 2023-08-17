@@ -472,7 +472,7 @@ export default function Editor() {
             </ListItem>
           </List>
           <Divider />
-          <List>
+          <List style={{ marginTop: 'auto' }}>
             <ListItem>
               <ListItemText primaryTypographyProps={{ fontSize: '0.5em' }}>
                 Version: {VERSION} <br />
