@@ -2,20 +2,20 @@
 
 Trucaption is a Computer-Aided Real Time Transcription (CART) system.
 
-Control Page:
+Editor Page:
 ![image](docs/images/control.png)
 
-Display (collapsable menu):
+Viewer (collapsable menu):
 ![image](docs/images/display.png)
 
-Full/big-screen display:
+Full/big-screen viewer:
 ![image](docs/images/fullscreen.png)
 
 ## Usage
 
 ### Generating Transcripts
 
-1. Open the control interface (default: http://localhost:8080/).
+1. Open the editor interface (default: http://localhost:8080/).
 2. Click "Connect" to initialize the speech recognition service.
 3. Click "Start Captions" to start captioning.
 
@@ -29,7 +29,7 @@ To cancel changes, press Escape.
 
 ### Displaying Captions
 
-1. Open the caption display (default: http://*caption-host*/). Additional
+1. Open the caption viewer (default: http://*caption-host*/). Additional
    parameters can be added to customize the display:
     - http://*caption-host*/?fullscreen will disable the menu and use the 
       default font size
