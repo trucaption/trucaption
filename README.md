@@ -53,9 +53,3 @@ Trucaption can be configured to use one of the following services:
 When using the native speech recognition engine or Speechly, All Caps is
 automatically enabled because these services return all text in lower case.
 All caps can be disabled via the menu on the controller.
-
-## Configuration
-
-To change the default configuration, create a config.ini file in the same
-folder as the executable. Refer to [config.ini.example](config.ini.example)
-for details.
