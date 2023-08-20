@@ -77,28 +77,34 @@ async function runServer() {
     const api = app_config.api;
 
     if (api === 'azure') {
-      const apiResponse = await axios({
-        method: 'post',
-        url: `https://${app_config.azure_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
-        headers: {
-          'Ocp-Apim-Subscription-Key': app_config.azure_subscription_key,
-          'Content-length': 0,
-          'Content-type': 'application/x-www-form-urlencoded',
-        },
-      });
-      azureToken = apiResponse.data;
-    }
+      try {
+        const apiResponse = await axios({
+          method: 'post',
+          url: `https://${app_config.azure_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
+          headers: {
+            'Ocp-Apim-Subscription-Key': app_config.azure_subscription_key,
+            'Content-length': 0,
+            'Content-type': 'application/x-www-form-urlencoded',
+          },
+        });
+        azureToken = apiResponse.data;
 
-    response.send({
-      api: api,
-      server_ip: ip.address(),
-      client_port: app_config.client_port,
-      clear_temp_on_stop: app_config.clear_temp_on_stop,
-      azure_token: api === 'azure' ? azureToken : '',
-      azure_region: api === 'azure' ? app_config.azure_region : '',
-      azure_endpoint_id: api === 'azure' ? app_config.azure_endpoint_id : '',
-      speechly_app: api === 'speechly' ? app_config.speechly_app : '',
-    });
+        response.send({
+          api: api,
+          server_ip: ip.address(),
+          client_port: app_config.client_port,
+          clear_temp_on_stop: app_config.clear_temp_on_stop,
+          azure_token: api === 'azure' ? azureToken : '',
+          azure_region: api === 'azure' ? app_config.azure_region : '',
+          azure_endpoint_id:
+            api === 'azure' ? app_config.azure_endpoint_id : '',
+          speechly_app: api === 'speechly' ? app_config.speechly_app : '',
+        });
+      } catch (error) {
+        console.log(`${error.message}`);
+        response.status(500).end();
+      }
+    }
   });
 
   controllerApp.get('/config', async (request, response) => {
