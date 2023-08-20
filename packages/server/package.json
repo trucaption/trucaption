@@ -9,7 +9,7 @@
     "test": "node src/server.js",
     "format": "npx rome format --write .",
     "check": "npx rome check .",
-    "package": "pkg . -C Brotli"
+    "package": "pkg . -C Brotli --no-bytecode"
   },
   "keywords": [
     "captions",
@@ -19,11 +19,11 @@
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@trucaption/common": "^0.0.1",
     "axios": "^0.27.2",
     "express": "^4.18.2",
     "express-static-gzip": "^2.1.7",
     "ip": "^1.1.8",
-    "nconf": "^0.12.0",
     "open": "^8.4.2",
     "socket.io": "^4.7.2"
   },
@@ -37,7 +37,7 @@
       "node18-linuxstatic-arm64"
     ],
     "assets": [
-      "dist/*/*",
+      "dist/**/*",
       "dist/xdg-open"
     ],
     "outputPath": "../../dist"

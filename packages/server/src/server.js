@@ -12,49 +12,57 @@ const expressStaticGzip = require('express-static-gzip');
 
 const { Server } = require('socket.io');
 
-const DEFAULT_CONFIG = require('./config.default.json');
-
+const fs = require('fs');
 const path = require('path');
-const nconf = require('nconf');
 
 const ip = require('ip');
 
 const { createServer } = require('http');
 const open = require('open');
 
-async function runServer() {
-  // Get configuration:
-  const configPath = path.join(process.env.PWD, 'config.ini');
-  nconf
-    .env({
-      parseValues: true,
-      transform: function (obj) {
-        if (!obj.key.toLowerCase().startsWith('trucaption_')) return false;
+const configJson = path.join(process.env.PWD, 'config.json');
 
-        obj.key = obj.key.toLowerCase().substring(11);
-        console.log(`Found environment variable: ${obj.key}`);
-        return obj;
-      },
-    })
-    .file({ file: configPath, format: nconf.formats.ini })
-    .defaults(DEFAULT_CONFIG);
+const app_config = {};
+
+function saveConfigToDisk() {
+  fs.writeFileSync(configJson, JSON.stringify(app_config, null, 2));
+}
+
+function updateConfig(key, value) {
+  if (key in app_config) {
+    app_config[key] = value;
+  }
+}
+
+async function runServer() {
+  const { DEFAULT_CONFIG } = await import('@trucaption/common');
+  Object.assign(app_config, DEFAULT_CONFIG);
+
+  if (fs.existsSync(configJson)) {
+    const json_config = JSON.parse(fs.readFileSync(configJson));
+    for (const [key, value] of Object.entries(json_config)) {
+      updateConfig(key, value);
+    }
+  }
+
+  saveConfigToDisk();
 
   const { AppServer: clientApp, HttpServer: clientHttp } = runWebServer(
     path.join(__dirname, '../webpack/viewer'),
-    nconf.get('client_port')
+    app_config.client_port
   );
   const { AppServer: controllerApp } = runWebServer(
     path.join(__dirname, '../webpack/editor'),
-    nconf.get('controller_port'),
+    app_config.controller_port,
     true
   );
 
   // Set up defaults
   controllerApp.get('/defaults', (request, response) =>
-    sendDefaults(response, nconf)
+    sendDefaults(response, app_config)
   );
   clientApp.get('/defaults', (request, response) =>
-    sendDefaults(response, nconf)
+    sendDefaults(response, app_config)
   );
 
   // Set up client socket
@@ -64,18 +72,16 @@ async function runServer() {
   controllerApp.use(express.json());
   controllerApp.use(urlencoded({ extended: false }));
 
-  controllerApp.get('/config', async (request, response) => {
+  controllerApp.get('/connect', async (request, response) => {
     let azureToken = '';
-    const api = nconf.get('api');
+    const api = app_config.api;
 
     if (api === 'azure') {
       const apiResponse = await axios({
         method: 'post',
-        url: `https://${nconf.get(
-          'azure_region'
-        )}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
+        url: `https://${app_config.azure_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
         headers: {
-          'Ocp-Apim-Subscription-Key': nconf.get('azure_subscription_key'),
+          'Ocp-Apim-Subscription-Key': app_config.azure_subscription_key,
           'Content-length': 0,
           'Content-type': 'application/x-www-form-urlencoded',
         },
@@ -86,13 +92,47 @@ async function runServer() {
     response.send({
       api: api,
       server_ip: ip.address(),
-      client_port: nconf.get('client_port'),
-      clear_temp_on_stop: nconf.get('clear_temp_on_stop'),
+      client_port: app_config.client_port,
+      clear_temp_on_stop: app_config.clear_temp_on_stop,
       azure_token: api === 'azure' ? azureToken : '',
-      azure_region: api === 'azure' ? nconf.get('azure_region') : '',
-      azure_endpoint_id: api === 'azure' ? nconf.get('azure_endpoint_id') : '',
-      speechly_app: api === 'speechly' ? nconf.get('speechly_app') : '',
+      azure_region: api === 'azure' ? app_config.azure_region : '',
+      azure_endpoint_id: api === 'azure' ? app_config.azure_endpoint_id : '',
+      speechly_app: api === 'speechly' ? app_config.speechly_app : '',
     });
+  });
+
+  controllerApp.get('/config', async (request, response) => {
+    const sanitized_config = Object.assign({}, app_config);
+    if (sanitized_config.azure_subscription_key)
+      sanitized_config.azure_subscription_key = 'defined';
+    if (sanitized_config.speechly_app)
+      sanitized_config.speechly_app = 'defined';
+    response.send(sanitized_config);
+  });
+
+  controllerApp.post('/config', async (request, response) => {
+    try {
+      const newConfig = Object.assign({}, request.body);
+
+      if (newConfig.azure_subscription_key === 'defined') {
+        newConfig.azure_subscription_key = app_config.azure_subscription_key;
+      }
+
+      if (newConfig.speechly_app === 'defined')
+        newConfig.speechly_app = app_config.speechly_app;
+
+      newConfig.font_size = Number.parseInt(newConfig.font_size);
+      newConfig.max_lines = Number.parseInt(newConfig.max_lines);
+      newConfig.controller_port = Number.parseInt(newConfig.controller_port);
+      newConfig.client_port = Number.parseInt(newConfig.client_port);
+
+      Object.assign(app_config, newConfig);
+      saveConfigToDisk();
+      response.status(201).end();
+    } catch (error) {
+      console.error(error);
+      response.status(500).end();
+    }
   });
 
   controllerApp.post('/message', (request, response) => {
@@ -106,7 +146,7 @@ async function runServer() {
     }
   });
 
-  open('http://localhost:8080');
+  open(`http://localhost:${app_config.controller_port}`);
 }
 
 function runWebServer(DIST_DIR, port, localOnly = false) {
@@ -130,9 +170,9 @@ function runWebServer(DIST_DIR, port, localOnly = false) {
 
 function sendDefaults(response, config) {
   response.send({
-    topic: config.get('topic'),
-    font_size: parseInt(config.get('font_size')),
-    max_lines: parseInt(config.get('max_lines')),
+    topic: app_config.topic,
+    font_size: parseInt(app_config.font_size),
+    max_lines: parseInt(app_config.max_lines),
   });
 }
 

@@ -5,3 +5,4 @@ webpack
 .DS_Store
 build/*
 !build/package.json
+config.json

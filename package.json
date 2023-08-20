@@ -12,7 +12,8 @@
   "license": "GPL-3.0-or-later",
   "workspaces": [
     "packages/web",
-    "packages/server"
+    "packages/server",
+    "packages/common"
   ],
   "devDependencies": {
     "rome": "^12.1.3"

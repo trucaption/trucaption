@@ -22,6 +22,7 @@ import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import versionCheck from '@version-checker/browser';
 
@@ -29,15 +30,26 @@ import fileDownload from 'js-file-download';
 
 import {
   Box,
+  Button,
   CssBaseline,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Drawer,
+  FormControl,
+  FormControlLabel,
   Input,
+  InputLabel,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  MenuItem,
+  Select,
   Slider,
   Switch,
   TextField,
@@ -57,6 +69,8 @@ import {
   trimTranscript,
 } from './Common.mjs';
 
+import { DEFAULT_CONFIG } from '@trucaption/common';
+
 const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
 const drawerWidth = 240;
 
@@ -71,12 +85,16 @@ export default function Editor() {
   const [updateState, setUpdateState] = useState('Unknown');
 
   const [config, setConfig] = useState(null);
+  const [updateConfig, setUpdateConfig] = useState(DEFAULT_CONFIG);
 
   const [useFilter, setUseFilter] = useState(true);
   const [useCaps, setUseCaps] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [wantListen, setWantListen] = useState(false);
+
+  const [configOpen, setConfigOpen] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const [tempTranscript, setTempTranscript] = useState('');
   const [sentLength, setSentLength] = useState(0);
@@ -192,6 +210,14 @@ export default function Editor() {
     autoScroll(endRef);
   });
 
+  function changeConfigValue(key, value) {
+    const newVal = {};
+    newVal[key] = value;
+    setUpdateConfig((prev) => {
+      return { ...prev, ...newVal };
+    });
+  }
+
   function startListening() {
     setWantListen(true);
 
@@ -233,7 +259,7 @@ export default function Editor() {
   async function login() {
     let response;
     try {
-      response = await SERVER_CLIENT.get('/config', {
+      response = await SERVER_CLIENT.get('/connect', {
         params: { room: room },
       });
     } catch (error) {
@@ -281,6 +307,7 @@ export default function Editor() {
       }
 
       default:
+        SpeechRecognition.removePolyfill();
         setUseCaps(true);
     }
 
@@ -310,6 +337,38 @@ export default function Editor() {
         setUpdateState('Not Available');
       }
     });
+  }
+
+  async function openConfig() {
+    let response;
+    try {
+      response = await SERVER_CLIENT.get('/config', {
+        params: { room: room },
+      });
+    } catch (error) {
+      console.log(error);
+      alert('Could not retrieve config.');
+      return null;
+    }
+
+    console.debug(response);
+    setUpdateConfig(response.data);
+
+    setConfigOpen(true);
+  }
+
+  async function saveConfig() {
+    try {
+      await SERVER_CLIENT.post('/config', updateConfig);
+    } catch (error) {
+      console.log(error);
+      alert('Could not save config.');
+      return null;
+    }
+
+    setMaxLines(updateConfig.max_lines);
+    setConfigOpen(false);
+    setLoggedIn(false);
   }
 
   // Load page
@@ -473,6 +532,14 @@ export default function Editor() {
           </List>
           <Divider />
           <List style={{ marginTop: 'auto' }}>
+            <ListItem key="Configure" disablePadding>
+              <ListItemButton onClick={openConfig} disabled={wantListen}>
+                <ListItemIcon>
+                  <SettingsIcon />
+                </ListItemIcon>
+                <ListItemText>Configure</ListItemText>
+              </ListItemButton>
+            </ListItem>
             <ListItem>
               <ListItemText primaryTypographyProps={{ fontSize: '0.5em' }}>
                 Version: {VERSION} <br />
@@ -512,6 +579,178 @@ export default function Editor() {
           </ThemeProvider>
           <Typography ref={endRef} />
         </Box>
+
+        <Dialog fullwidth scroll="paper" open={configOpen} onClose={null}>
+          <DialogTitle>Configure</DialogTitle>
+          <DialogContent>
+            <FormControl fullWidth variant="standard">
+              <DialogContentText sx={{ fontWeight: 'bold' }}>
+                Transcription Settings
+              </DialogContentText>
+
+              <Select
+                value={updateConfig.api}
+                label="Transcription Engine"
+                fullWidth
+                onChange={(event) =>
+                  changeConfigValue('api', event.target.value)
+                }
+              >
+                <MenuItem value="browser">Browser Native</MenuItem>
+                <MenuItem value="azure">Azure</MenuItem>
+                <MenuItem value="speechly">Speechly</MenuItem>
+              </Select>
+              {updateConfig.api === 'azure' && (
+                <>
+                  <TextField
+                    label="Azure Region"
+                    margin="normal"
+                    variant="standard"
+                    fullWidth
+                    value={updateConfig.azure_region}
+                    required
+                    onChange={(event) =>
+                      changeConfigValue('azure_region', event.target.value)
+                    }
+                  />
+                  <TextField
+                    label="Azure Subscription Key"
+                    type="password"
+                    margin="normal"
+                    variant="standard"
+                    fullWidth
+                    required
+                    value={updateConfig.azure_subscription_key}
+                    onChange={(event) =>
+                      changeConfigValue(
+                        'azure_subscription_key',
+                        event.target.value
+                      )
+                    }
+                  />
+                  <TextField
+                    label="Azure Endpoint ID"
+                    margin="normal"
+                    variant="standard"
+                    fullWidth
+                    value={updateConfig.azure_endpoint_id}
+                    onChange={(event) =>
+                      changeConfigValue('azure_endpoint_id', event.target.value)
+                    }
+                  />
+                </>
+              )}
+              {updateConfig.api === 'speechly' && (
+                <>
+                  <TextField
+                    label="Speechly App"
+                    margin="normal"
+                    type="password"
+                    fullWidth
+                    variant="standard"
+                    required
+                    value={updateConfig.speechly_app}
+                    onChange={(event) =>
+                      changeConfigValue('speechly_app', event.target.value)
+                    }
+                  />
+                </>
+              )}
+              <Divider />
+              <DialogContentText sx={{ fontWeight: 'bold' }}>
+                App Settings
+              </DialogContentText>
+              <TextField
+                label="Maximum Lines"
+                margin="normal"
+                variant="standard"
+                fullWidth
+                type="number"
+                value={updateConfig.max_lines}
+                required
+                onChange={(event) =>
+                  changeConfigValue('max_lines', event.target.value)
+                }
+              />
+              <TextField
+                label="Default Font Size"
+                margin="normal"
+                variant="standard"
+                fullWidth
+                type="number"
+                value={updateConfig.font_size}
+                required
+                onChange={(event) =>
+                  changeConfigValue('font_size', event.target.value)
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={updateConfig.clear_temp_on_stop}
+                    onChange={(event) =>
+                      changeConfigValue(
+                        'clear_temp_on_stop',
+                        event.target.checked
+                      )
+                    }
+                  />
+                }
+                label="Clear temporary transcript on stop"
+              />
+              <Divider />
+              <FormControlLabel
+                control={
+                  <Switch
+                    value={showAdvanced}
+                    onChange={(event) => {
+                      setShowAdvanced(event.target.checked);
+                    }}
+                  />
+                }
+                label="Display Advanced Settings"
+              />
+              {showAdvanced && (
+                <>
+                  <DialogContentText sx={{ fontWeight: 'bold' }}>
+                    Ports
+                  </DialogContentText>
+                  <TextField
+                    label="Editor Port"
+                    margin="normal"
+                    variant="standard"
+                    fullWidth
+                    type="number"
+                    value={updateConfig.controller_port}
+                    required
+                    onChange={(event) =>
+                      changeConfigValue('controller_port', event.target.value)
+                    }
+                  />
+                  <TextField
+                    label="Viewer Port"
+                    margin="normal"
+                    variant="standard"
+                    fullWidth
+                    type="number"
+                    value={updateConfig.client_port}
+                    required
+                    onChange={(event) =>
+                      changeConfigValue('client_port', event.target.value)
+                    }
+                  />
+                  <DialogContentText>
+                    Note: Port changes require a restart to take effect.
+                  </DialogContentText>
+                </>
+              )}
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfigOpen(false)}>Cancel</Button>
+            <Button onClick={saveConfig}>Save</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </ThemeProvider>
   );

@@ -16,6 +16,7 @@
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.5",
+    "@trucaption/common": "^0.0.1",
     "axios": "^1.4.0",
     "css-loader": "^6.8.1",
     "mui-image": "^1.0.7",
