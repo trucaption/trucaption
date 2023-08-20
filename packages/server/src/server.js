@@ -20,7 +20,7 @@ const ip = require('ip');
 const { createServer } = require('http');
 const open = require('open');
 
-const configJson = path.join(process.env.PWD, 'config.json');
+const configJson = path.join(process.cwd(), 'config.json');
 
 const app_config = {};
 
@@ -76,8 +76,8 @@ async function runServer() {
     let azureToken = '';
     const api = app_config.api;
 
-    if (api === 'azure') {
-      try {
+    try {
+      if (api === 'azure') {
         const apiResponse = await axios({
           method: 'post',
           url: `https://${app_config.azure_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
@@ -88,22 +88,21 @@ async function runServer() {
           },
         });
         azureToken = apiResponse.data;
-
-        response.send({
-          api: api,
-          server_ip: ip.address(),
-          client_port: app_config.client_port,
-          clear_temp_on_stop: app_config.clear_temp_on_stop,
-          azure_token: api === 'azure' ? azureToken : '',
-          azure_region: api === 'azure' ? app_config.azure_region : '',
-          azure_endpoint_id:
-            api === 'azure' ? app_config.azure_endpoint_id : '',
-          speechly_app: api === 'speechly' ? app_config.speechly_app : '',
-        });
-      } catch (error) {
-        console.log(`${error.message}`);
-        response.status(500).end();
       }
+
+      response.send({
+        api: api,
+        server_ip: ip.address(),
+        client_port: app_config.client_port,
+        clear_temp_on_stop: app_config.clear_temp_on_stop,
+        azure_token: api === 'azure' ? azureToken : '',
+        azure_region: api === 'azure' ? app_config.azure_region : '',
+        azure_endpoint_id: api === 'azure' ? app_config.azure_endpoint_id : '',
+        speechly_app: api === 'speechly' ? app_config.speechly_app : '',
+      });
+    } catch (error) {
+      console.log(`${error.message}`);
+      response.status(500).end();
     }
   });
 
