@@ -6,3 +6,9 @@ webpack
 build/*
 !build/package.json
 config.json
+Gemfile.lock
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
