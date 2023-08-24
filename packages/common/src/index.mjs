@@ -4,6 +4,7 @@ export const DEFAULT_CONFIG = {
     "client_port": 80,
     "azure_subscription_key": null,
     "azure_region": null,
+    "language": "en-US",
     "speechly_app": null,
     "topic": "",
     "font_size": 20,

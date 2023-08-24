@@ -1,6 +1,6 @@
 {
   "name": "@trucaption/common",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Computer-aided realtime transcription",
   "type": "module",
   "exports": "./src/index.mjs",

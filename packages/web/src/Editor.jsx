@@ -13,11 +13,16 @@ import SpeechRecognition, {
 import axios from 'axios';
 
 import BadWordsNext from 'bad-words-next';
-import en from 'bad-words-next/data/en.json';
+import getUserLocale from 'get-user-locale';
+
+import BadWordsDictionaries from './BadWordsDictionaries.mjs';
+
+import locale from 'locale-codes';
 
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import DownloadIcon from '@mui/icons-material/Download';
 import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock';
+import LanguageIcon from '@mui/icons-material/Language';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
@@ -86,9 +91,15 @@ export default function Editor() {
 
   const [config, setConfig] = useState(null);
   const [updateConfig, setUpdateConfig] = useState(DEFAULT_CONFIG);
+  const [allowedLanguages, setAllowedLanguages] = useState([
+    DEFAULT_CONFIG.language,
+  ]);
 
   const [useFilter, setUseFilter] = useState(true);
   const [useCaps, setUseCaps] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState(
+    DEFAULT_CONFIG.language
+  );
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [wantListen, setWantListen] = useState(false);
@@ -102,7 +113,7 @@ export default function Editor() {
   const [transcript, setTranscript] = useState(new Object());
   const [sentTranscript, setSentTranscript] = useState(new Object());
 
-  const badwords = new BadWordsNext({ data: en });
+  let badwords = new BadWordsNext({ data: BadWordsDictionaries.en });
   const searchParams = new URLSearchParams(document.location.search);
 
   const {
@@ -155,7 +166,9 @@ export default function Editor() {
   function applyTextEffects(text) {
     let finalText = text;
 
+    console.debug(finalText);
     if (useFilter) finalText = badwords.filter(finalText);
+    console.debug(finalText);
     if (useCaps) finalText = finalText.toUpperCase();
 
     return finalText.trim();
@@ -221,10 +234,30 @@ export default function Editor() {
   function startListening() {
     setWantListen(true);
 
-    SpeechRecognition.startListening({
+    const listeningConfig = {
       continuous: true,
-      language: 'en-US',
-    });
+    };
+
+    console.debug(`Listening via speech API: ${config.api}`);
+
+    let targetDict = 'en';
+
+    if (config.api === 'azure' || config.api === 'speechly') {
+      listeningConfig.language = currentLanguage;
+      targetDict = locale.getByTag(currentLanguage)['iso639-1'];
+      console.log(`Starting captions with configured language: ${currentLanguage}`);
+    } else {
+      const userLocale = getUserLocale();
+      targetDict = locale.getByTag(userLocale)['iso639-1'];
+      console.log(`Starting captions with browser language: ${userLocale}`);
+    }
+
+    console.log(`Loading bad-words dictionary: ${targetDict}`);
+    const dict = BadWordsDictionaries[targetDict];
+    console.debug(dict);
+    badwords = new BadWordsNext({ data: dict });
+
+    SpeechRecognition.startListening(listeningConfig);
   }
 
   function stopListening() {
@@ -238,6 +271,10 @@ export default function Editor() {
     }
 
     setTempTranscript('');
+  }
+
+  function languageChangeAllowed() {
+    return !wantListen && loggedIn && config && config.api !== "browser";
   }
 
   async function resetScreen() {
@@ -287,6 +324,9 @@ export default function Editor() {
               : undefined,
           });
         SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
+        setAllowedLanguages(filterLanguages(response.data.azure_languages));
+        setCurrentLanguage(response.data.language);
+        console.debug(locale.getByTag(response.data.language));
         setUseCaps(false);
         console.log('Initialized Azure Speech Services');
         break;
@@ -300,6 +340,8 @@ export default function Editor() {
         const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
           response.data.speechly_app
         );
+        setAllowedLanguages([DEFAULT_CONFIG.language]);
+        setCurrentLanguage(DEFAULT_CONFIG.language);
         SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
         setUseCaps(true);
         console.log('Initialized Speechly');
@@ -308,11 +350,24 @@ export default function Editor() {
 
       default:
         SpeechRecognition.removePolyfill();
+        setAllowedLanguages(['']);
+        setCurrentLanguage('');
         setUseCaps(true);
     }
 
     setLoggedIn(true);
     sendMessage('', 'reset');
+  }
+
+  function filterLanguages(languages) {
+    return languages.map((item) => {
+      const loc = locale.getByTag(item);
+
+      if (!loc) return;
+      if (!loc['iso639-1'] in BadWordsDictionaries) return;
+
+      return item;
+    });
   }
 
   function openClient() {
@@ -337,6 +392,8 @@ export default function Editor() {
         setUpdateState('Not Available');
       }
     });
+
+    console.debug(`Detected locale: ${getUserLocale()}`);
   }
 
   async function openConfig() {
@@ -393,7 +450,7 @@ export default function Editor() {
           anchor="left"
         >
           <List disablePadding>
-            <ListItem disablePadding>
+            <ListItem disablePadding key="logo">
               <Image src={Logo} duration={0} />
             </ListItem>
           </List>
@@ -422,6 +479,32 @@ export default function Editor() {
           </List>
           <Divider />
           <List>
+            <ListItem key="language">
+              <ListItemIcon>
+                <LanguageIcon color={ languageChangeAllowed() ? "inherit" : "disabled"} />
+              </ListItemIcon>
+              <ListItemText>
+                <Select
+                  value={currentLanguage}
+                  disabled={!languageChangeAllowed()}
+                  label="Language"
+                  variant="standard"
+                  onChange={(e) => {
+                    setCurrentLanguage(e.target.value);
+                  }}
+                  fullWidth
+                >
+                  {allowedLanguages.map((item) => {
+                    const loc = locale.getByTag(item);
+                    if (loc && loc['iso639-1'] in BadWordsDictionaries) return (
+                      <MenuItem value={item} key={item}>
+                        {loc.name} ({loc.location})
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </ListItemText>
+            </ListItem>
             <ListItem key="Start" disablePadding>
               <ListItemButton
                 disabled={
@@ -640,6 +723,23 @@ export default function Editor() {
                   />
                 </>
               )}
+              {config &&
+                config.api === 'azure' &&
+                updateConfig.api === 'azure' && (
+                  <>
+                    <DialogContentText>
+                      Default language: {updateConfig.language}
+                    </DialogContentText>
+                    <Button
+                      variant="text"
+                      onClick={(event) =>
+                        changeConfigValue('language', currentLanguage)
+                      }
+                    >
+                      Set Current Language as Default
+                    </Button>
+                  </>
+                )}
               {updateConfig.api === 'speechly' && (
                 <>
                   <TextField

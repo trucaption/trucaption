@@ -74,6 +74,7 @@ async function runServer() {
 
   controllerApp.get('/connect', async (request, response) => {
     let azureToken = '';
+    let azureLanguages = [];
     const api = app_config.api;
 
     try {
@@ -88,14 +89,25 @@ async function runServer() {
           },
         });
         azureToken = apiResponse.data;
+
+        const azureLanguagesResponse = await axios({
+            method: 'get',
+            url: `https://${app_config.azure_region}.api.cognitive.microsoft.com/speechtotext/v3.1/evaluations/locales`,
+            headers: {
+              'Ocp-Apim-Subscription-Key': app_config.azure_subscription_key,
+            },
+          });
+          azureLanguages = azureLanguagesResponse.data;
       }
 
       response.send({
         api: api,
         server_ip: ip.address(),
         client_port: app_config.client_port,
+        language: app_config.language,
         clear_temp_on_stop: app_config.clear_temp_on_stop,
         azure_token: api === 'azure' ? azureToken : '',
+        azure_languages: api === 'azure' ? azureLanguages : '',
         azure_region: api === 'azure' ? app_config.azure_region : '',
         azure_endpoint_id: api === 'azure' ? app_config.azure_endpoint_id : '',
         speechly_app: api === 'speechly' ? app_config.speechly_app : '',
