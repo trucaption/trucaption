@@ -21,6 +21,8 @@ import locale from 'locale-codes';
 
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import DownloadIcon from '@mui/icons-material/Download';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock';
 import LanguageIcon from '@mui/icons-material/Language';
 import MicIcon from '@mui/icons-material/Mic';
@@ -36,6 +38,7 @@ import fileDownload from 'js-file-download';
 import {
   Box,
   Button,
+  Collapse,
   CssBaseline,
   Dialog,
   DialogActions,
@@ -104,6 +107,7 @@ export default function Editor() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [wantListen, setWantListen] = useState(false);
 
+  const [configMenuOpen, setConfigMenuOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -245,7 +249,9 @@ export default function Editor() {
     if (config.api === 'azure' || config.api === 'speechly') {
       listeningConfig.language = currentLanguage;
       targetDict = locale.getByTag(currentLanguage)['iso639-1'];
-      console.log(`Starting captions with configured language: ${currentLanguage}`);
+      console.log(
+        `Starting captions with configured language: ${currentLanguage}`
+      );
     } else {
       const userLocale = getUserLocale();
       targetDict = locale.getByTag(userLocale)['iso639-1'];
@@ -274,7 +280,7 @@ export default function Editor() {
   }
 
   function languageChangeAllowed() {
-    return !wantListen && loggedIn && config && config.api !== "browser";
+    return !wantListen && loggedIn && config && config.api !== 'browser';
   }
 
   async function resetScreen() {
@@ -479,32 +485,6 @@ export default function Editor() {
           </List>
           <Divider />
           <List>
-            <ListItem key="language">
-              <ListItemIcon>
-                <LanguageIcon color={ languageChangeAllowed() ? "inherit" : "disabled"} />
-              </ListItemIcon>
-              <ListItemText>
-                <Select
-                  value={currentLanguage}
-                  disabled={!languageChangeAllowed()}
-                  label="Language"
-                  variant="standard"
-                  onChange={(e) => {
-                    setCurrentLanguage(e.target.value);
-                  }}
-                  fullWidth
-                >
-                  {allowedLanguages.map((item) => {
-                    const loc = locale.getByTag(item);
-                    if (loc && loc['iso639-1'] in BadWordsDictionaries) return (
-                      <MenuItem value={item} key={item}>
-                        {loc.name} ({loc.location})
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </ListItemText>
-            </ListItem>
             <ListItem key="Start" disablePadding>
               <ListItemButton
                 disabled={
@@ -543,53 +523,6 @@ export default function Editor() {
           </List>
           <Divider />
           <List>
-            <ListItem>
-              <ListItemIcon>
-                <ChatBubbleIcon />
-              </ListItemIcon>
-              <ListItemText>Word Filter</ListItemText>
-              <Switch
-                disabled={!loggedIn}
-                edge="end"
-                checked={useFilter}
-                onChange={(e) => {
-                  setUseFilter(e.target.checked);
-                }}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <KeyboardCapslockIcon />
-              </ListItemIcon>
-              <ListItemText>All Caps</ListItemText>
-              <Switch
-                disabled={!loggedIn}
-                edge="end"
-                checked={useCaps}
-                onChange={(e) => {
-                  setUseCaps(e.target.checked);
-                }}
-              />
-            </ListItem>
-          </List>
-          <Divider />
-          <List>
-            <ListItem disablePadding>
-              <ListItemText>Font Size: ({size})</ListItemText>
-            </ListItem>
-            <ListItem>
-              <Slider
-                disabled={!loggedIn}
-                aria-label="Size"
-                value={size}
-                onChange={(e, newValue) => {
-                  setSize(newValue);
-                }}
-              />
-            </ListItem>
-          </List>
-          <Divider />
-          <List>
             <ListItem key="OpenClient" disablePadding>
               <ListItemButton
                 disabled={!loggedIn || !browserSupportsSpeechRecognition}
@@ -614,22 +547,112 @@ export default function Editor() {
             </ListItem>
           </List>
           <Divider />
-          <List style={{ marginTop: 'auto' }}>
-            <ListItem key="Configure" disablePadding>
-              <ListItemButton onClick={openConfig} disabled={wantListen}>
+          <ListItem key="OpenConfigMenu" disablePadding>
+            <ListItemButton onClick={() => setConfigMenuOpen(!configMenuOpen)}>
+              <ListItemIcon>
+                { configMenuOpen ? <ExpandLessIcon/> : <ExpandMoreIcon /> }
+              </ListItemIcon>
+              <ListItemText>Settings</ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={configMenuOpen}>
+            <List>
+              <ListItem key="language">
                 <ListItemIcon>
-                  <SettingsIcon />
+                  <LanguageIcon
+                    color={languageChangeAllowed() ? 'inherit' : 'disabled'}
+                  />
                 </ListItemIcon>
-                <ListItemText>Configure</ListItemText>
-              </ListItemButton>
-            </ListItem>
-            <ListItem>
-              <ListItemText primaryTypographyProps={{ fontSize: '0.5em' }}>
-                Version: {VERSION} <br />
-                Update: {updateState}
-              </ListItemText>
-            </ListItem>
-          </List>
+                <ListItemText>
+                  <Select
+                    value={currentLanguage}
+                    disabled={!languageChangeAllowed()}
+                    label="Language"
+                    variant="standard"
+                    onChange={(e) => {
+                      setCurrentLanguage(e.target.value);
+                    }}
+                    fullWidth
+                  >
+                    {allowedLanguages.map((item) => {
+                      const loc = locale.getByTag(item);
+                      if (loc && loc['iso639-1'] in BadWordsDictionaries)
+                        return (
+                          <MenuItem value={item} key={item}>
+                            {loc.name} ({loc.location})
+                          </MenuItem>
+                        );
+                    })}
+                  </Select>
+                </ListItemText>
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <ChatBubbleIcon />
+                </ListItemIcon>
+                <ListItemText>Word Filter</ListItemText>
+                <Switch
+                  disabled={!loggedIn}
+                  edge="end"
+                  checked={useFilter}
+                  onChange={(e) => {
+                    setUseFilter(e.target.checked);
+                  }}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <KeyboardCapslockIcon />
+                </ListItemIcon>
+                <ListItemText>All Caps</ListItemText>
+                <Switch
+                  disabled={!loggedIn}
+                  edge="end"
+                  checked={useCaps}
+                  onChange={(e) => {
+                    setUseCaps(e.target.checked);
+                  }}
+                />
+              </ListItem>
+            </List>
+            <Divider />
+            <List>
+              <ListItem>
+                <ListItemText>Font Size: ({size})</ListItemText>
+              </ListItem>
+              <ListItem>
+                <Slider
+                  disabled={!loggedIn}
+                  aria-label="Size"
+                  value={size}
+                  onChange={(e, newValue) => {
+                    setSize(newValue);
+                  }}
+                />
+              </ListItem>
+              <ListItem key="Configure" disablePadding>
+                <ListItemButton onClick={openConfig} disabled={wantListen}>
+                  <ListItemIcon>
+                    <SettingsIcon />
+                  </ListItemIcon>
+                  <ListItemText>Setup</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </Collapse>
+          {!configMenuOpen && (
+            <>
+              <Divider />
+              <List style={{ marginTop: 'auto' }}>
+                <ListItem>
+                  <ListItemText primaryTypographyProps={{ fontSize: '0.5em' }}>
+                    Version: {VERSION} <br />
+                    Update: {updateState}
+                  </ListItemText>
+                </ListItem>
+              </List>
+            </>
+          )}
         </Drawer>
         <Box
           component="main"
