@@ -17,16 +17,22 @@ import getUserLocale from 'get-user-locale';
 
 import BadWordsDictionaries from './BadWordsDictionaries.mjs';
 
+import AppMenuItem from './Menu/AppMenuItem';
+
+import AdvancedSettings from './Settings/AdvancedSettings';
+import DisplaySettings from './Settings/DisplaySettings';
+import TranscriptionSettings from './Settings/TranscriptionSettings';
+
 import locale from 'locale-codes';
 
-import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import DownloadIcon from '@mui/icons-material/Download';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock';
+import InterpreterModeIcon from '@mui/icons-material/InterpreterMode';
 import LanguageIcon from '@mui/icons-material/Language';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
+import MonitorIcon from '@mui/icons-material/Monitor';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -37,30 +43,18 @@ import fileDownload from 'js-file-download';
 
 import {
   Box,
-  Button,
   Collapse,
   CssBaseline,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider,
   Drawer,
-  FormControl,
-  FormControlLabel,
   Input,
-  InputLabel,
   List,
   ListItem,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
   MenuItem,
   Select,
   Slider,
-  Switch,
-  TextField,
   Toolbar,
   Typography,
 } from '@mui/material';
@@ -98,8 +92,6 @@ export default function Editor() {
     DEFAULT_CONFIG.language,
   ]);
 
-  const [useFilter, setUseFilter] = useState(true);
-  const [useCaps, setUseCaps] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(
     DEFAULT_CONFIG.language
   );
@@ -107,9 +99,13 @@ export default function Editor() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [wantListen, setWantListen] = useState(false);
 
+  const [dialogs, setDialogs] = useState({
+    display: false,
+    transcription: false,
+    advanced: false,
+  });
+
   const [configMenuOpen, setConfigMenuOpen] = useState(false);
-  const [configOpen, setConfigOpen] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const [tempTranscript, setTempTranscript] = useState('');
   const [sentLength, setSentLength] = useState(0);
@@ -171,9 +167,9 @@ export default function Editor() {
     let finalText = text;
 
     console.debug(finalText);
-    if (useFilter) finalText = badwords.filter(finalText);
+    if (config.word_filter) finalText = badwords.filter(finalText);
     console.debug(finalText);
-    if (useCaps) finalText = finalText.toUpperCase();
+    if (config.all_caps) finalText = finalText.toUpperCase();
 
     return finalText.trim();
   }
@@ -333,7 +329,6 @@ export default function Editor() {
         setAllowedLanguages(filterLanguages(response.data.azure_languages));
         setCurrentLanguage(response.data.language);
         console.debug(locale.getByTag(response.data.language));
-        setUseCaps(false);
         console.log('Initialized Azure Speech Services');
         break;
       }
@@ -349,7 +344,6 @@ export default function Editor() {
         setAllowedLanguages([DEFAULT_CONFIG.language]);
         setCurrentLanguage(DEFAULT_CONFIG.language);
         SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
-        setUseCaps(true);
         console.log('Initialized Speechly');
         break;
       }
@@ -358,7 +352,6 @@ export default function Editor() {
         SpeechRecognition.removePolyfill();
         setAllowedLanguages(['']);
         setCurrentLanguage('');
-        setUseCaps(true);
     }
 
     setLoggedIn(true);
@@ -402,7 +395,7 @@ export default function Editor() {
     console.debug(`Detected locale: ${getUserLocale()}`);
   }
 
-  async function openConfig() {
+  async function openConfig(panel) {
     let response;
     try {
       response = await SERVER_CLIENT.get('/config', {
@@ -417,10 +410,18 @@ export default function Editor() {
     console.debug(response);
     setUpdateConfig(response.data);
 
-    setConfigOpen(true);
+    configPanel(panel, true);
   }
 
-  async function saveConfig() {
+  function configPanel(panel, open) {
+    const openDialog = {};
+    openDialog[panel] = open;
+    setDialogs((prev) => {
+      return { ...prev, ...openDialog };
+    });
+  }
+
+  async function saveConfig(panel, logoff = false) {
     try {
       await SERVER_CLIENT.post('/config', updateConfig);
     } catch (error) {
@@ -430,8 +431,13 @@ export default function Editor() {
     }
 
     setMaxLines(updateConfig.max_lines);
-    setConfigOpen(false);
-    setLoggedIn(false);
+    configPanel(panel, false);
+
+    if (logoff) {
+      setLoggedIn(false);
+    } else {
+      setConfig(updateConfig);
+    }
   }
 
   // Load page
@@ -461,14 +467,12 @@ export default function Editor() {
             </ListItem>
           </List>
           <List>
-            <ListItem key="Login" disablePadding>
-              <ListItemButton disabled={loggedIn} onClick={login}>
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText>Connect</ListItemText>
-              </ListItemButton>
-            </ListItem>
+            <AppMenuItem
+              disabled={loggedIn}
+              onClick={login}
+              icon={<InboxIcon />}
+              text="Connect"
+            />
           </List>
           <Divider />
           <List>
@@ -485,76 +489,54 @@ export default function Editor() {
           </List>
           <Divider />
           <List>
-            <ListItem key="Start" disablePadding>
-              <ListItemButton
-                disabled={
-                  !loggedIn || listening || !browserSupportsSpeechRecognition
-                }
-                onClick={startListening}
-              >
-                <ListItemIcon>
-                  <MicIcon />
-                </ListItemIcon>
-                <ListItemText>Start Captions</ListItemText>
-              </ListItemButton>
-            </ListItem>
-            <ListItem key="Stop" disablePadding>
-              <ListItemButton
-                disabled={!loggedIn || !listening}
-                onClick={stopListening}
-              >
-                <ListItemIcon>
-                  <MicOffIcon />
-                </ListItemIcon>
-                <ListItemText>Stop Captions</ListItemText>
-              </ListItemButton>
-            </ListItem>
+            <AppMenuItem
+              disabled={
+                !loggedIn || listening || !browserSupportsSpeechRecognition
+              }
+              onClick={startListening}
+              icon={<MicIcon />}
+              text="Start Captions"
+            />
+            <AppMenuItem
+              disabled={!loggedIn || !listening}
+              onClick={stopListening}
+              icon={<MicOffIcon />}
+              text="Stop Captions"
+            />
           </List>
           <Divider />
           <List>
-            <ListItem key="Start" disablePadding>
-              <ListItemButton disabled={!loggedIn} onClick={resetScreen}>
-                <ListItemIcon>
-                  <MicIcon />
-                </ListItemIcon>
-                <ListItemText>Reset Captions</ListItemText>
-              </ListItemButton>
-            </ListItem>
+            <AppMenuItem
+              disabled={!loggedIn}
+              onClick={resetScreen}
+              icon={<MicIcon />}
+              text="Reset Captions"
+            />
           </List>
           <Divider />
           <List>
-            <ListItem key="OpenClient" disablePadding>
-              <ListItemButton
-                disabled={!loggedIn || !browserSupportsSpeechRecognition}
-                onClick={openClient}
-              >
-                <ListItemIcon>
-                  <OpenInNewIcon />
-                </ListItemIcon>
-                <ListItemText>Open Viewer</ListItemText>
-              </ListItemButton>
-            </ListItem>
-            <ListItem key="Download" disablePadding>
-              <ListItemButton
-                disabled={!loggedIn || !browserSupportsSpeechRecognition}
-                onClick={downloadTranscript}
-              >
-                <ListItemIcon>
-                  <DownloadIcon />
-                </ListItemIcon>
-                <ListItemText>Download</ListItemText>
-              </ListItemButton>
-            </ListItem>
+            <AppMenuItem
+              disabled={!loggedIn || !browserSupportsSpeechRecognition}
+              onClick={openClient}
+              icon={<OpenInNewIcon />}
+              text="Open Viewer"
+            />
+            <AppMenuItem
+              disabled={!loggedIn || !browserSupportsSpeechRecognition}
+              onClick={downloadTranscript}
+              icon={<DownloadIcon />}
+              text="Download"
+            />
           </List>
           <Divider />
-          <ListItem key="OpenConfigMenu" disablePadding>
-            <ListItemButton onClick={() => setConfigMenuOpen(!configMenuOpen)}>
-              <ListItemIcon>
-                { configMenuOpen ? <ExpandLessIcon/> : <ExpandMoreIcon /> }
-              </ListItemIcon>
-              <ListItemText>Settings</ListItemText>
-            </ListItemButton>
-          </ListItem>
+          <List>
+            <AppMenuItem
+              disabled={false}
+              onClick={() => setConfigMenuOpen(!configMenuOpen)}
+              icon={configMenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              text="Settings"
+            />
+          </List>
           <Collapse in={configMenuOpen}>
             <List>
               <ListItem key="language">
@@ -587,37 +569,6 @@ export default function Editor() {
                 </ListItemText>
               </ListItem>
               <ListItem>
-                <ListItemIcon>
-                  <ChatBubbleIcon />
-                </ListItemIcon>
-                <ListItemText>Word Filter</ListItemText>
-                <Switch
-                  disabled={!loggedIn}
-                  edge="end"
-                  checked={useFilter}
-                  onChange={(e) => {
-                    setUseFilter(e.target.checked);
-                  }}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <KeyboardCapslockIcon />
-                </ListItemIcon>
-                <ListItemText>All Caps</ListItemText>
-                <Switch
-                  disabled={!loggedIn}
-                  edge="end"
-                  checked={useCaps}
-                  onChange={(e) => {
-                    setUseCaps(e.target.checked);
-                  }}
-                />
-              </ListItem>
-            </List>
-            <Divider />
-            <List>
-              <ListItem>
                 <ListItemText>Font Size: ({size})</ListItemText>
               </ListItem>
               <ListItem>
@@ -630,28 +581,35 @@ export default function Editor() {
                   }}
                 />
               </ListItem>
-              <ListItem key="Configure" disablePadding>
-                <ListItemButton onClick={openConfig} disabled={wantListen}>
-                  <ListItemIcon>
-                    <SettingsIcon />
-                  </ListItemIcon>
-                  <ListItemText>Setup</ListItemText>
-                </ListItemButton>
-              </ListItem>
+              <AppMenuItem
+                disabled={wantListen}
+                onClick={() => openConfig('transcription')}
+                icon={<InterpreterModeIcon />}
+                text="Transcription Engine"
+              />
+              <AppMenuItem
+                disabled={false}
+                onClick={() => openConfig('display')}
+                icon={<MonitorIcon />}
+                text="Display Settings"
+              />
+              <AppMenuItem
+                disabled={wantListen}
+                onClick={() => openConfig('advanced')}
+                icon={<SettingsIcon />}
+                text="Advanced Settings"
+              />
             </List>
           </Collapse>
           {!configMenuOpen && (
-            <>
-              <Divider />
-              <List style={{ marginTop: 'auto' }}>
-                <ListItem>
-                  <ListItemText primaryTypographyProps={{ fontSize: '0.5em' }}>
-                    Version: {VERSION} <br />
-                    Update: {updateState}
-                  </ListItemText>
-                </ListItem>
-              </List>
-            </>
+            <List style={{ marginTop: 'auto' }}>
+              <ListItem>
+                <ListItemText primaryTypographyProps={{ fontSize: '0.5em' }}>
+                  Version: {VERSION} <br />
+                  Update: {updateState}
+                </ListItemText>
+              </ListItem>
+            </List>
           )}
         </Drawer>
         <Box
@@ -686,194 +644,31 @@ export default function Editor() {
           <Typography ref={endRef} />
         </Box>
 
-        <Dialog fullwidth scroll="paper" open={configOpen} onClose={null}>
-          <DialogTitle>Configure</DialogTitle>
-          <DialogContent>
-            <FormControl fullWidth variant="standard">
-              <DialogContentText sx={{ fontWeight: 'bold' }}>
-                Transcription Settings
-              </DialogContentText>
+        <TranscriptionSettings
+          open={dialogs.transcription}
+          config={config}
+          updateConfig={updateConfig}
+          onChangeFunction={changeConfigValue}
+          onCancel={() => configPanel('transcription', false)}
+          onSave={() => saveConfig('transcription', true)}
+          currentLanguage={currentLanguage}
+        />
 
-              <Select
-                value={updateConfig.api}
-                label="Transcription Engine"
-                fullWidth
-                onChange={(event) =>
-                  changeConfigValue('api', event.target.value)
-                }
-              >
-                <MenuItem value="browser">Browser Native</MenuItem>
-                <MenuItem value="azure">Azure</MenuItem>
-                <MenuItem value="speechly">Speechly</MenuItem>
-              </Select>
-              {updateConfig.api === 'azure' && (
-                <>
-                  <TextField
-                    label="Azure Region"
-                    margin="normal"
-                    variant="standard"
-                    fullWidth
-                    value={updateConfig.azure_region}
-                    required
-                    onChange={(event) =>
-                      changeConfigValue('azure_region', event.target.value)
-                    }
-                  />
-                  <TextField
-                    label="Azure Subscription Key"
-                    type="password"
-                    margin="normal"
-                    variant="standard"
-                    fullWidth
-                    required
-                    value={updateConfig.azure_subscription_key}
-                    onChange={(event) =>
-                      changeConfigValue(
-                        'azure_subscription_key',
-                        event.target.value
-                      )
-                    }
-                  />
-                  <TextField
-                    label="Azure Endpoint ID"
-                    margin="normal"
-                    variant="standard"
-                    fullWidth
-                    value={updateConfig.azure_endpoint_id}
-                    onChange={(event) =>
-                      changeConfigValue('azure_endpoint_id', event.target.value)
-                    }
-                  />
-                </>
-              )}
-              {config &&
-                config.api === 'azure' &&
-                updateConfig.api === 'azure' && (
-                  <>
-                    <DialogContentText>
-                      Default language: {updateConfig.language}
-                    </DialogContentText>
-                    <Button
-                      variant="text"
-                      onClick={(event) =>
-                        changeConfigValue('language', currentLanguage)
-                      }
-                    >
-                      Set Current Language as Default
-                    </Button>
-                  </>
-                )}
-              {updateConfig.api === 'speechly' && (
-                <>
-                  <TextField
-                    label="Speechly App"
-                    margin="normal"
-                    type="password"
-                    fullWidth
-                    variant="standard"
-                    required
-                    value={updateConfig.speechly_app}
-                    onChange={(event) =>
-                      changeConfigValue('speechly_app', event.target.value)
-                    }
-                  />
-                </>
-              )}
-              <Divider />
-              <DialogContentText sx={{ fontWeight: 'bold' }}>
-                App Settings
-              </DialogContentText>
-              <TextField
-                label="Maximum Lines"
-                margin="normal"
-                variant="standard"
-                fullWidth
-                type="number"
-                value={updateConfig.max_lines}
-                required
-                onChange={(event) =>
-                  changeConfigValue('max_lines', event.target.value)
-                }
-              />
-              <TextField
-                label="Default Font Size"
-                margin="normal"
-                variant="standard"
-                fullWidth
-                type="number"
-                value={updateConfig.font_size}
-                required
-                onChange={(event) =>
-                  changeConfigValue('font_size', event.target.value)
-                }
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={updateConfig.clear_temp_on_stop}
-                    onChange={(event) =>
-                      changeConfigValue(
-                        'clear_temp_on_stop',
-                        event.target.checked
-                      )
-                    }
-                  />
-                }
-                label="Clear temporary transcript on stop"
-              />
-              <Divider />
-              <FormControlLabel
-                control={
-                  <Switch
-                    value={showAdvanced}
-                    onChange={(event) => {
-                      setShowAdvanced(event.target.checked);
-                    }}
-                  />
-                }
-                label="Display Advanced Settings"
-              />
-              {showAdvanced && (
-                <>
-                  <DialogContentText sx={{ fontWeight: 'bold' }}>
-                    Ports
-                  </DialogContentText>
-                  <TextField
-                    label="Editor Port"
-                    margin="normal"
-                    variant="standard"
-                    fullWidth
-                    type="number"
-                    value={updateConfig.controller_port}
-                    required
-                    onChange={(event) =>
-                      changeConfigValue('controller_port', event.target.value)
-                    }
-                  />
-                  <TextField
-                    label="Viewer Port"
-                    margin="normal"
-                    variant="standard"
-                    fullWidth
-                    type="number"
-                    value={updateConfig.client_port}
-                    required
-                    onChange={(event) =>
-                      changeConfigValue('client_port', event.target.value)
-                    }
-                  />
-                  <DialogContentText>
-                    Note: Port changes require a restart to take effect.
-                  </DialogContentText>
-                </>
-              )}
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setConfigOpen(false)}>Cancel</Button>
-            <Button onClick={saveConfig}>Save</Button>
-          </DialogActions>
-        </Dialog>
+        <DisplaySettings
+          open={dialogs.display}
+          updateConfig={updateConfig}
+          onChangeFunction={changeConfigValue}
+          onCancel={() => configPanel('display', false)}
+          onSave={() => saveConfig('display', true)}
+        />
+
+        <AdvancedSettings
+          open={dialogs.advanced}
+          updateConfig={updateConfig}
+          onChangeFunction={changeConfigValue}
+          onCancel={() => configPanel('advanced', false)}
+          onSave={() => saveConfig('advanced', true)}
+        />
       </Box>
     </ThemeProvider>
   );
