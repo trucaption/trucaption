@@ -20,7 +20,8 @@ const ip = require('ip');
 const { createServer } = require('http');
 const open = require('open');
 
-const configJson = path.join(process.cwd(), 'config.json');
+// eval() is needed here, otherwise ncc/pkg will try to use config.json from the package
+const configJson = path.join(eval("process.cwd()"), 'config.json');
 
 const app_config = {};
 
