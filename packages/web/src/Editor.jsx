@@ -363,7 +363,7 @@ export default function Editor() {
       const loc = locale.getByTag(item);
 
       if (!loc) return;
-      if (!loc['iso639-1'] in BadWordsDictionaries) return;
+      if (!(loc['iso639-1'] in BadWordsDictionaries)) return;
 
       return item;
     });

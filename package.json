@@ -2,7 +2,11 @@
   "name": "@trucaption/repo",
   "version": "1.2.0",
   "description": "Computer-aided realtime transcription",
-  "scripts": {},
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "start": "npm run start --workspace='@trucaption/trucaption'"
+  },
   "keywords": [
     "captions",
     "transcript",
@@ -11,9 +15,9 @@
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
   "workspaces": [
+    "packages/common",
     "packages/web",
-    "packages/server",
-    "packages/common"
+    "packages/server"
   ],
   "devDependencies": {
     "rome": "^12.1.3"
