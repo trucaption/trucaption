@@ -9,7 +9,7 @@
     "test": "node src/server.js",
     "format": "npx rome format --write .",
     "check": "npx rome check .",
-    "package": "pkg . -C Brotli --no-bytecode"
+    "package": "cross-conf-env pkg . -C Brotli --no-bytecode --output='../../dist/trucaption-$npm_package_version'"
   },
   "keywords": [
     "captions",
@@ -38,11 +38,11 @@
     "assets": [
       "dist/**/*",
       "dist/xdg-open"
-    ],
-    "outputPath": "../../dist"
+    ]
   },
   "devDependencies": {
     "@vercel/ncc": "^0.36.1",
+    "cross-conf-env": "^1.3.0",
     "pkg": "^5.8.1"
   }
 }

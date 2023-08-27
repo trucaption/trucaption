@@ -5,7 +5,8 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "start": "npm run start --workspace='@trucaption/trucaption'"
+    "start": "npm run start --workspace='@trucaption/trucaption'",
+    "package": "npm run package --workspace='@trucaption/trucaption'"
   },
   "keywords": [
     "captions",
