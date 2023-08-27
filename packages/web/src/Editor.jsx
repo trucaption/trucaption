@@ -604,7 +604,7 @@ export default function Editor() {
           {!configMenuOpen && (
             <List style={{ marginTop: 'auto' }}>
               <ListItem>
-                <ListItemText primaryTypographyProps={{ fontSize: '0.5em' }}>
+                <ListItemText>
                   Version: {VERSION} <br />
                   Update: {updateState}
                 </ListItemText>
