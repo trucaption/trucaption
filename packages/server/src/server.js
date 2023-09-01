@@ -4,6 +4,8 @@
     @license GPL-3.0-or-later
 */
 
+const log = require('electron-log');
+
 const express = require('express');
 const axios = require('axios');
 const { urlencoded } = require('body-parser');
@@ -12,20 +14,42 @@ const expressStaticGzip = require('express-static-gzip');
 
 const { Server } = require('socket.io');
 
+const { DEFAULT_CONFIG } = require('@trucaption/common');
+
 const fs = require('fs');
 const path = require('path');
 
 const ip = require('ip');
+const querystring = require('querystring');
 
 const { createServer } = require('http');
-const open = require('open');
-
-// eval() is needed here, otherwise ncc/pkg will try to use config.json from the package
-const configJson = path.join(eval("process.cwd()"), 'config.json');
 
 const app_config = {};
 
+const { app, BrowserWindow, shell } = require('electron');
+
+const createWindow = () => {
+  const win = new BrowserWindow({
+    width: 300,
+    height: 600,
+  });
+
+  const data = querystring.stringify({
+    editorUrl: `http://localhost:${app_config.controller_port}/`,
+    editorPort: app_config.controller_port,
+    viewerPort: app_config.client_port
+  })
+
+  win.loadURL(`http://localhost:${app_config.controller_port}/app/?${data}`);
+
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+};
+
 function saveConfigToDisk() {
+  const configJson = path.join(app.getPath("userData"), 'config.json');
   fs.writeFileSync(configJson, JSON.stringify(app_config, null, 2));
 }
 
@@ -36,8 +60,10 @@ function updateConfig(key, value) {
 }
 
 async function runServer() {
-  const { DEFAULT_CONFIG } = await import('@trucaption/common');
   Object.assign(app_config, DEFAULT_CONFIG);
+
+  await app.whenReady();
+  const configJson = path.join(app.getPath("userData"), 'config.json');
 
   if (fs.existsSync(configJson)) {
     const json_config = JSON.parse(fs.readFileSync(configJson));
@@ -92,13 +118,13 @@ async function runServer() {
         azureToken = apiResponse.data;
 
         const azureLanguagesResponse = await axios({
-            method: 'get',
-            url: `https://${app_config.azure_region}.api.cognitive.microsoft.com/speechtotext/v3.1/evaluations/locales`,
-            headers: {
-              'Ocp-Apim-Subscription-Key': app_config.azure_subscription_key,
-            },
-          });
-          azureLanguages = azureLanguagesResponse.data;
+          method: 'get',
+          url: `https://${app_config.azure_region}.api.cognitive.microsoft.com/speechtotext/v3.1/evaluations/locales`,
+          headers: {
+            'Ocp-Apim-Subscription-Key': app_config.azure_subscription_key,
+          },
+        });
+        azureLanguages = azureLanguagesResponse.data;
       }
 
       response.send({
@@ -114,7 +140,7 @@ async function runServer() {
         speechly_app: api === 'speechly' ? app_config.speechly_app : '',
       });
     } catch (error) {
-      console.log(`${error.message}`);
+      log.log(`${error.message}`);
       response.status(500).end();
     }
   });
@@ -148,7 +174,7 @@ async function runServer() {
       saveConfigToDisk();
       response.status(201).end();
     } catch (error) {
-      console.error(error);
+      log.error(error);
       response.status(500).end();
     }
   });
@@ -160,11 +186,15 @@ async function runServer() {
         .emit(request.body.queue, request.body.data);
       response.status(201).end();
     } catch (error) {
-      console.log(error);
+      log.log(error);
     }
   });
 
-  open(`http://localhost:${app_config.controller_port}`);
+  createWindow();
+
+  app.on('window-all-closed', () => {
+    app.quit();
+  });
 }
 
 function runWebServer(DIST_DIR, port, localOnly = false) {
@@ -181,7 +211,7 @@ function runWebServer(DIST_DIR, port, localOnly = false) {
   const http = createServer(app);
   http.listen(port, localOnly ? '127.0.0.1' : '0.0.0.0');
 
-  console.log(`Serving ${DIST_DIR} on port ${port}`);
+  log.log(`Serving ${DIST_DIR} on port ${port}`);
 
   return { AppServer: app, HttpServer: http };
 }
@@ -194,4 +224,6 @@ function sendDefaults(response, config) {
   });
 }
 
-runServer();
+runServer().catch((error) => {
+    log.error(error);
+  });

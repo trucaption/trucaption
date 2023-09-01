@@ -2,8 +2,7 @@
   "name": "@trucaption/common",
   "version": "0.2.0",
   "description": "Computer-aided realtime transcription",
-  "type": "module",
-  "exports": "./src/index.mjs",
+  "exports": "./src/index.js",
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later"
 }

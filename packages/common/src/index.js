@@ -1,4 +1,4 @@
-export const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG = {
   api: 'browser',
   controller_port: 8080,
   client_port: 80,
@@ -14,3 +14,5 @@ export const DEFAULT_CONFIG = {
   word_filter: true,
   all_caps: false,
 };
+
+module.exports = { DEFAULT_CONFIG };

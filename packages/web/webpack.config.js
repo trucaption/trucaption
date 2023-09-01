@@ -62,7 +62,6 @@ const viewer = {
   output: {
     filename: '[name].[chunkhash].js',
     path: path.resolve(__dirname, '../server/webpack/viewer'),
-    clean: true,
   },
   plugins: pluginConfig,
   module: moduleConfig,
@@ -75,7 +74,6 @@ const editor = {
   output: {
     filename: '[name].[chunkhash].js',
     path: path.resolve(__dirname, '../server/webpack/editor'),
-    clean: true,
   },
   plugins: pluginConfig,
   module: moduleConfig,
@@ -83,5 +81,17 @@ const editor = {
   optimization: optimizationConfig,
 };
 
-module.exports = [editor, viewer];
-module.exports.parallelism = 2;
+const app = {
+  entry: ['./src/App.js'],
+  output: {
+    filename: '[name].[chunkhash].js',
+    path: path.resolve(__dirname, '../server/webpack/editor/app'),
+  },
+  plugins: pluginConfig,
+  module: moduleConfig,
+  resolve: resolveConfig,
+  optimization: optimizationConfig,
+};
+
+module.exports = [editor, viewer, app];
+module.exports.parallelism = 3;
