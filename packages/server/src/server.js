@@ -224,6 +224,8 @@ function sendDefaults(response, config) {
   });
 }
 
+if (require('electron-squirrel-startup')) app.quit();
+
 runServer().catch((error) => {
     log.error(error);
   });

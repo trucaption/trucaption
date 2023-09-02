@@ -2,9 +2,11 @@
   "name": "@trucaption/repo",
   "private": true,
   "version": "1.2.0",
-  "description": "Computer-aided realtime transcription",
+  "description": "Computer-aided real-time captioning",
   "scripts": {
-    "make": "yarn workspace trucaption make",
+    "make:win": "yarn workspace trucaption make:win",
+    "make:darwin": "yarn workspace trucaption make:darwin",
+    "make:linux": "yarn workspace trucaption make:linux",
     "start": "yarn workspace trucaption start"
   },
   "keywords": [

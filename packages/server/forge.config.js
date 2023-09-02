@@ -2,7 +2,15 @@ module.exports = {
   packagerConfig: {
     asar: true,
     derefSymlinks: true,
-    icon: 'build/icon' // no file extension required
+    icon: 'build/icon',
+    osxSign: {
+      identity: process.env.SIGNING_ID,
+      optionsForFile: (filePath) => {
+        return {
+          entitlements: 'entitlements.plist',
+        };
+      },
+    },
   },
   rebuildConfig: {},
   makers: [
@@ -11,16 +19,25 @@ module.exports = {
       config: {},
     },
     {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      name: '@electron-forge/maker-dmg',
+      config: {
+        background: './build/dmg-background.png',
+        additionalDMGOptions: {
+          'background-color': 'yellow'
+        }
+      },
     },
     {
       name: '@electron-forge/maker-deb',
       config: {},
     },
     {
-      name: '@electron-forge/maker-rpm',
-      config: {},
+      name: '@electron-forge/maker-snap',
+      config: {
+        features: {
+          browserSandbox: true,
+        },
+      },
     },
   ],
   plugins: [
