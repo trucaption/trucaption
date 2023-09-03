@@ -539,6 +539,7 @@ export default function Editor() {
           </List>
           <Collapse in={configMenuOpen}>
             <List>
+            {loggedIn && config && config.api === 'azure' && (
               <ListItem key="language">
                 <ListItemIcon>
                   <LanguageIcon
@@ -558,7 +559,15 @@ export default function Editor() {
                   >
                     {allowedLanguages.map((item) => {
                       const loc = locale.getByTag(item);
-                      if (loc && loc['iso639-1'] in BadWordsDictionaries)
+                      const allowed =
+                        config.allowed_languages.length === 0
+                          ? true
+                          : config.allowed_languages.includes(item);
+                      if (
+                        loc &&
+                        loc['iso639-1'] in BadWordsDictionaries &&
+                        allowed
+                      )
                         return (
                           <MenuItem value={item} key={item}>
                             {loc.name} ({loc.location})
@@ -568,6 +577,7 @@ export default function Editor() {
                   </Select>
                 </ListItemText>
               </ListItem>
+            )}
               <ListItem>
                 <ListItemText>Font Size: ({size})</ListItemText>
               </ListItem>
@@ -652,6 +662,7 @@ export default function Editor() {
           onCancel={() => configPanel('transcription', false)}
           onSave={() => saveConfig('transcription', true)}
           currentLanguage={currentLanguage}
+          allowedLanguages={allowedLanguages}
         />
 
         <DisplaySettings

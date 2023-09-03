@@ -1,15 +1,40 @@
 import {
   Button,
+  Chip,
   DialogContentText,
+  Divider,
   MenuItem,
   Select,
+  Stack,
   TextField,
 } from '@mui/material';
 
+import { useState } from 'react';
+
 import SettingsDialog from './SettingsDialog';
 
+import locale from 'locale-codes';
+
+import BadWordsDictionaries from '../BadWordsDictionaries.mjs';
+
+function handleDelete(chipToDelete, allowed_languages) {
+  const newArray = allowed_languages.filter((chip) => chip !== chipToDelete);
+  console.log(chipToDelete);
+  console.log(allowed_languages);
+  console.log(newArray);
+  return newArray;
+}
+
 export default function TranscriptionSettings(props) {
-  const { updateConfig, onChangeFunction, config, currentLanguage } = props;
+  const {
+    updateConfig,
+    onChangeFunction,
+    config,
+    currentLanguage,
+    allowedLanguages,
+  } = props;
+
+  const [languageSelect, setLanguageSelect] = useState('');
 
   return (
     <SettingsDialog {...props} title="Transcription Settings">
@@ -62,6 +87,61 @@ export default function TranscriptionSettings(props) {
       )}
       {config && config.api === 'azure' && updateConfig.api === 'azure' && (
         <>
+          <DialogContentText>Allowed languages:</DialogContentText>
+          <Stack direction="row" spacing={1}>
+            {updateConfig.allowed_languages.map((data) => {
+              return (
+                <>
+                  <Chip
+                    label={data}
+                    onDelete={(event) => {
+                      onChangeFunction(
+                        'allowed_languages',
+                        handleDelete(data, updateConfig.allowed_languages)
+                      );
+                    }}
+                  />
+                </>
+              );
+            })}
+          </Stack>
+          <Select
+            value={languageSelect}
+            label="Language"
+            variant="standard"
+            onChange={(e) => {
+              setLanguageSelect(e.target.value);
+            }}
+          >
+            {allowedLanguages.map((item) => {
+              const loc = locale.getByTag(item);
+              if (
+                loc &&
+                loc['iso639-1'] in BadWordsDictionaries &&
+                !updateConfig.allowed_languages.includes(item)
+              )
+                return (
+                  <MenuItem value={item} key={item}>
+                    {loc.name} ({loc.location})
+                  </MenuItem>
+                );
+            })}
+          </Select>
+          <Button
+            variant="text"
+            onClick={(event) => {
+              if (!updateConfig.allowed_languages.includes(languageSelect)) {
+                onChangeFunction(
+                  'allowed_languages',
+                  updateConfig.allowed_languages.concat(languageSelect)
+                );
+              }
+            }}
+          >
+            Add Language
+          </Button>
+
+          <Divider />
           <DialogContentText>
             Default language: {updateConfig.language}
           </DialogContentText>

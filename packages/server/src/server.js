@@ -127,18 +127,16 @@ async function runServer() {
         azureLanguages = azureLanguagesResponse.data;
       }
 
-      response.send({
-        api: api,
+      const responseJson = {
         server_ip: ip.address(),
-        client_port: app_config.client_port,
-        language: app_config.language,
-        clear_temp_on_stop: app_config.clear_temp_on_stop,
         azure_token: api === 'azure' ? azureToken : '',
         azure_languages: api === 'azure' ? azureLanguages : '',
         azure_region: api === 'azure' ? app_config.azure_region : '',
         azure_endpoint_id: api === 'azure' ? app_config.azure_endpoint_id : '',
         speechly_app: api === 'speechly' ? app_config.speechly_app : '',
-      });
+      }
+
+      response.send({ ...getSanitizedConfig(app_config), ...responseJson});
     } catch (error) {
       log.log(`${error.message}`);
       response.status(500).end();
@@ -146,12 +144,7 @@ async function runServer() {
   });
 
   controllerApp.get('/config', async (request, response) => {
-    const sanitized_config = Object.assign({}, app_config);
-    if (sanitized_config.azure_subscription_key)
-      sanitized_config.azure_subscription_key = 'defined';
-    if (sanitized_config.speechly_app)
-      sanitized_config.speechly_app = 'defined';
-    response.send(sanitized_config);
+    response.send(getSanitizedConfig(app_config));
   });
 
   controllerApp.post('/config', async (request, response) => {
@@ -222,6 +215,16 @@ function sendDefaults(response, config) {
     font_size: parseInt(app_config.font_size),
     max_lines: parseInt(app_config.max_lines),
   });
+}
+
+function getSanitizedConfig(config) {
+  const sanitized_config = Object.assign({}, config);
+  if (sanitized_config.azure_subscription_key)
+    sanitized_config.azure_subscription_key = 'defined';
+  if (sanitized_config.speechly_app)
+    sanitized_config.speechly_app = 'defined';
+
+  return sanitized_config;
 }
 
 if (require('electron-squirrel-startup')) app.quit();

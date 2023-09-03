@@ -13,6 +13,7 @@ const DEFAULT_CONFIG = {
   azure_endpoint_id: '',
   word_filter: true,
   all_caps: false,
+  allowed_languages: [],
 };
 
 module.exports = { DEFAULT_CONFIG };

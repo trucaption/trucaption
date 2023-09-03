@@ -15,7 +15,7 @@ export default function SettingsDialog({
   title,
 }) {
   return (
-    <Dialog fullWidth scroll="paper" open={open} onClose={null}>
+    <Dialog scroll="paper" open={open} onClose={null}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <FormControl fullWidth variant="standard">
