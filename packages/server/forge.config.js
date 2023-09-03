@@ -4,12 +4,16 @@ module.exports = {
     derefSymlinks: true,
     icon: 'build/icon',
     osxSign: {
-      identity: process.env.SIGNING_ID,
       optionsForFile: (filePath) => {
         return {
           entitlements: 'entitlements.plist',
         };
       },
+    },
+    osxNotarize: {
+      tool: 'notarytool',
+      keychain: process.env.NOTARY_KEYCHAIN,
+      keychainProfile: process.env.NOTARY_PROFILE
     },
   },
   rebuildConfig: {},
@@ -17,8 +21,7 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        signWithParams:
-          ` /n "${process.env.SIGNING_ID}" /t ${process.env.TIMESTAMP_SERVER} /fd sha256`,
+        signWithParams: ` /n "${process.env.SIGNING_ID}" /t ${process.env.TIMESTAMP_SERVER} /fd sha256`,
       },
     },
     {
@@ -38,6 +41,11 @@ module.exports = {
           browserSandbox: true,
         },
       },
+    },
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['darwin', 'linux'],
+      config: {},
     },
   ],
   plugins: [
