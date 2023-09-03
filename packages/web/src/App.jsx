@@ -4,7 +4,7 @@
     @license GPL-3.0-or-later
 */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
@@ -24,6 +24,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import Logo from '../assets/logo.png';
 import Image from 'mui-image';
 
+import versionCheck from '@version-checker/browser';
+
 import { baseTheme } from './Common.mjs';
 
 export default function App() {
@@ -38,8 +40,37 @@ export default function App() {
   const [viewerPort, setViewerPort] = useState(
     searchParams.has('viewerPort') ? searchParams.get('viewerPort') : ''
   );
+  const [appVersion, setAppVersion] = useState(
+    searchParams.has('version') ? searchParams.get('version') : ''
+  );
+  const [updateState, setUpdateState] = useState('Unknown');
+
+  const versionOptions = {
+    repo: 'trucaption',
+    owner: 'dkaser',
+    currentVersion: searchParams.has('version') ? searchParams.get('version') : '',
+  };
 
   const drawerWidth = 300;
+
+  useEffect(() => {
+    versionCheck(versionOptions, function (error, update) {
+      if (error) {
+        console.log(error);
+        return;
+      }
+
+      console.debug(update);
+
+      if (update.update) {
+        console.log(`An update is available: ${update.update.name}`);
+        setUpdateState('Available');
+      } else {
+        console.log('Version is current');
+        setUpdateState('Not Available');
+      }
+    });
+  })
 
   return (
     <ThemeProvider theme={baseTheme}>
@@ -74,14 +105,19 @@ export default function App() {
           </List>
           <Divider />
           <List>
-            <ListItem disablePadding>
+            <ListItem>
               <ListItemText>Editor Port: {editorPort}</ListItemText>
             </ListItem>
-            <ListItem disablePadding>
+            <ListItem>
               <ListItemText>Viewer Port: {viewerPort}</ListItemText>
             </ListItem>
+          </List>
+          <List style={{ marginTop: 'auto' }} >
             <ListItem>
-              <ListItemText>Version: {VERSION}</ListItemText>
+              <ListItemText>Version: {appVersion}</ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemText>Update: {updateState}</ListItemText>
             </ListItem>
           </List>
         </Drawer>

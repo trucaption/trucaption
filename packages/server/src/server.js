@@ -37,7 +37,8 @@ const createWindow = () => {
   const data = querystring.stringify({
     editorUrl: `http://localhost:${app_config.controller_port}/`,
     editorPort: app_config.controller_port,
-    viewerPort: app_config.client_port
+    viewerPort: app_config.client_port,
+    version: app.getVersion()
   })
 
   win.loadURL(`http://localhost:${app_config.controller_port}/app/?${data}`);

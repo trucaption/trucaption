@@ -37,8 +37,6 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-import versionCheck from '@version-checker/browser';
-
 import fileDownload from 'js-file-download';
 
 import {
@@ -84,7 +82,6 @@ export default function Editor() {
   const [size, setSize] = useState(20);
   const [room, setRoom] = useState('');
   const [maxLines, setMaxLines] = useState(-1);
-  const [updateState, setUpdateState] = useState('Unknown');
 
   const [config, setConfig] = useState(null);
   const [updateConfig, setUpdateConfig] = useState(DEFAULT_CONFIG);
@@ -123,12 +120,6 @@ export default function Editor() {
     resetTranscript,
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
-
-  const versionOptions = {
-    repo: 'trucaption',
-    owner: 'dkaser',
-    currentVersion: VERSION,
-  };
 
   function sendMessage(message, messageType = 'final') {
     try {
@@ -375,22 +366,6 @@ export default function Editor() {
 
   async function loadPage() {
     await getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
-    versionCheck(versionOptions, function (error, update) {
-      if (error) {
-        console.log(error);
-        return;
-      }
-
-      console.debug(update);
-
-      if (update.update) {
-        console.log(`An update is available: ${update.update.name}`);
-        setUpdateState('Available');
-      } else {
-        console.log('Version is current');
-        setUpdateState('Not Available');
-      }
-    });
 
     console.debug(`Detected locale: ${getUserLocale()}`);
   }
@@ -611,16 +586,6 @@ export default function Editor() {
               />
             </List>
           </Collapse>
-          {!configMenuOpen && (
-            <List style={{ marginTop: 'auto' }}>
-              <ListItem>
-                <ListItemText>
-                  Version: {VERSION} <br />
-                  Update: {updateState}
-                </ListItemText>
-              </ListItem>
-            </List>
-          )}
         </Drawer>
         <Box
           component="main"
