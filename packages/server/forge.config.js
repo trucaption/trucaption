@@ -16,15 +16,15 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        signWithParams:
+          ` /n "${process.env.SIGNING_ID}" /t ${process.env.TIMESTAMP_SERVER} /fd sha256`,
+      },
     },
     {
       name: '@electron-forge/maker-dmg',
       config: {
         background: './build/dmg-background.png',
-        additionalDMGOptions: {
-          'background-color': 'yellow'
-        }
       },
     },
     {

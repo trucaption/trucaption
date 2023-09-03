@@ -9,7 +9,7 @@
     "make:darwin": "yarn run make:darwin-x64 && yarn run make:darwin-arm64",
     "make:darwin-x64": "electron-forge make --platform=darwin --arch=x64",
     "make:darwin-arm64": "electron-forge make --platform=darwin --arch=arm64",
-    "make:win": "yarn run make:darwin-x64 && yarn run make:darwin-arm64",
+    "make:win": "yarn run make:win-x64 && yarn run make:win-arm64",
     "make:win-x64": "electron-forge make --platform=win32 --arch=x64",
     "make:win-arm64": "electron-forge make --platform=win32 --arch=arm64",
     "make:linux": "yarn run make:linux-x64 && yarn run make:linux-arm64",
