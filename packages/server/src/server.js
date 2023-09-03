@@ -38,8 +38,8 @@ const createWindow = () => {
     editorUrl: `http://localhost:${app_config.controller_port}/`,
     editorPort: app_config.controller_port,
     viewerPort: app_config.client_port,
-    version: app.getVersion()
-  })
+    version: app.getVersion(),
+  });
 
   win.loadURL(`http://localhost:${app_config.controller_port}/app/?${data}`);
 
@@ -50,7 +50,7 @@ const createWindow = () => {
 };
 
 function saveConfigToDisk() {
-  const configJson = path.join(app.getPath("userData"), 'config.json');
+  const configJson = path.join(app.getPath('userData'), 'config.json');
   fs.writeFileSync(configJson, JSON.stringify(app_config, null, 2));
 }
 
@@ -64,7 +64,7 @@ async function runServer() {
   Object.assign(app_config, DEFAULT_CONFIG);
 
   await app.whenReady();
-  const configJson = path.join(app.getPath("userData"), 'config.json');
+  const configJson = path.join(app.getPath('userData'), 'config.json');
 
   if (fs.existsSync(configJson)) {
     const json_config = JSON.parse(fs.readFileSync(configJson));
@@ -135,9 +135,9 @@ async function runServer() {
         azure_region: api === 'azure' ? app_config.azure_region : '',
         azure_endpoint_id: api === 'azure' ? app_config.azure_endpoint_id : '',
         speechly_app: api === 'speechly' ? app_config.speechly_app : '',
-      }
+      };
 
-      response.send({ ...getSanitizedConfig(app_config), ...responseJson});
+      response.send({ ...getSanitizedConfig(app_config), ...responseJson });
     } catch (error) {
       log.log(`${error.message}`);
       response.status(500).end();
@@ -222,14 +222,17 @@ function getSanitizedConfig(config) {
   const sanitized_config = Object.assign({}, config);
   if (sanitized_config.azure_subscription_key)
     sanitized_config.azure_subscription_key = 'defined';
-  if (sanitized_config.speechly_app)
-    sanitized_config.speechly_app = 'defined';
+  if (sanitized_config.speechly_app) sanitized_config.speechly_app = 'defined';
 
   return sanitized_config;
 }
 
 if (require('electron-squirrel-startup')) app.quit();
 
+require('update-electron-app')({
+  logger: log
+});
+
 runServer().catch((error) => {
-    log.error(error);
-  });
+  log.error(error);
+});

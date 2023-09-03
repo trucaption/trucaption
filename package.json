@@ -17,6 +17,7 @@
   ],
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
+  "repository": "github:dkaser/trucaption",
   "workspaces": [
     "packages/*"
   ],
