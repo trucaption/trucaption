@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 
 export default function SettingsDialog({
+  configType,
   open,
   onCancel,
   onSave,
@@ -15,7 +16,7 @@ export default function SettingsDialog({
   title,
 }) {
   return (
-    <Dialog scroll="paper" open={open} onClose={null}>
+    <Dialog scroll="paper" open={open[configType]} onClose={null}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <FormControl fullWidth variant="standard">

@@ -34,7 +34,6 @@ import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import MonitorIcon from '@mui/icons-material/Monitor';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import fileDownload from 'js-file-download';
@@ -69,7 +68,7 @@ import {
   trimTranscript,
 } from './Common.mjs';
 
-import { DEFAULT_CONFIG } from '@trucaption/common';
+import { CONFIG_SETTINGS, getDefaultsObject } from '@trucaption/common';
 
 const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
 const drawerWidth = 240;
@@ -81,16 +80,16 @@ const SERVER_CLIENT = axios.create({
 export default function Editor() {
   const [size, setSize] = useState(20);
   const [room, setRoom] = useState('');
-  const [maxLines, setMaxLines] = useState(-1);
 
-  const [config, setConfig] = useState(null);
-  const [updateConfig, setUpdateConfig] = useState(DEFAULT_CONFIG);
+  const [activeConfig, setActiveConfig] = useState(getDefaultsObject());
+  const [changedConfig, setChangedConfig] = useState(getDefaultsObject());
+
   const [allowedLanguages, setAllowedLanguages] = useState([
-    DEFAULT_CONFIG.language,
+    CONFIG_SETTINGS.transcription.defaults.language,
   ]);
 
   const [currentLanguage, setCurrentLanguage] = useState(
-    DEFAULT_CONFIG.language
+    CONFIG_SETTINGS.transcription.defaults.language
   );
 
   const [loggedIn, setLoggedIn] = useState(false);
@@ -99,7 +98,7 @@ export default function Editor() {
   const [dialogs, setDialogs] = useState({
     display: false,
     transcription: false,
-    advanced: false,
+    app: false,
   });
 
   const [configMenuOpen, setConfigMenuOpen] = useState(false);
@@ -127,6 +126,7 @@ export default function Editor() {
         room: room,
         queue: messageType,
         data: message,
+        language: currentLanguage,
       };
 
       SERVER_CLIENT.post('/message', payload);
@@ -139,7 +139,7 @@ export default function Editor() {
     const lineChange = {};
 
     lineChange[lineNumber] = text;
-    setTranscript((prev) => trimTranscript(prev, lineChange, maxLines));
+    setTranscript((prev) => trimTranscript(prev, lineChange, activeConfig.display.max_lines));
     if (send) {
       sendMessage(JSON.stringify({ line: lineNumber, text: text }));
       setSentTranscript((prev) => {
@@ -157,10 +157,9 @@ export default function Editor() {
   function applyTextEffects(text) {
     let finalText = text;
 
-    console.debug(finalText);
-    if (config.word_filter) finalText = badwords.filter(finalText);
-    console.debug(finalText);
-    if (config.all_caps) finalText = finalText.toUpperCase();
+    if (activeConfig.display.word_filter)
+      finalText = badwords.filter(finalText);
+    if (activeConfig.display.all_caps) finalText = finalText.toUpperCase();
 
     return finalText.trim();
   }
@@ -214,10 +213,12 @@ export default function Editor() {
     autoScroll(endRef);
   });
 
-  function changeConfigValue(key, value) {
+  function changeConfigValue(configType, key, value) {
     const newVal = {};
-    newVal[key] = value;
-    setUpdateConfig((prev) => {
+    newVal[configType] = Object.assign({}, changedConfig[configType]);
+    newVal[configType][key] = value;
+
+    setChangedConfig((prev) => {
       return { ...prev, ...newVal };
     });
   }
@@ -229,11 +230,16 @@ export default function Editor() {
       continuous: true,
     };
 
-    console.debug(`Listening via speech API: ${config.api}`);
+    console.debug(
+      `Listening via speech API: ${activeConfig.transcription.api}`
+    );
 
     let targetDict = 'en';
 
-    if (config.api === 'azure' || config.api === 'speechly') {
+    if (
+      activeConfig.transcription.api === 'azure' ||
+      activeConfig.transcription.api === 'speechly'
+    ) {
       listeningConfig.language = currentLanguage;
       targetDict = locale.getByTag(currentLanguage)['iso639-1'];
       console.log(
@@ -247,7 +253,6 @@ export default function Editor() {
 
     console.log(`Loading bad-words dictionary: ${targetDict}`);
     const dict = BadWordsDictionaries[targetDict];
-    console.debug(dict);
     badwords = new BadWordsNext({ data: dict });
 
     SpeechRecognition.startListening(listeningConfig);
@@ -257,7 +262,7 @@ export default function Editor() {
     setWantListen(false);
     SpeechRecognition.abortListening();
 
-    if (!config.clear_temp_on_stop) {
+    if (!activeConfig.display.clear_temp_on_stop) {
       setLine(line + 1);
 
       updateTranscript(line, applyTextEffects(interimTranscript));
@@ -267,7 +272,7 @@ export default function Editor() {
   }
 
   function languageChangeAllowed() {
-    return !wantListen && loggedIn && config && config.api !== 'browser';
+    return !wantListen && loggedIn;
   }
 
   async function resetScreen() {
@@ -289,9 +294,7 @@ export default function Editor() {
   async function login() {
     let response;
     try {
-      response = await SERVER_CLIENT.get('/connect', {
-        params: { room: room },
-      });
+      response = await SERVER_CLIENT.get('/connect');
     } catch (error) {
       console.log(error);
       alert('Login failed.');
@@ -299,9 +302,8 @@ export default function Editor() {
     }
 
     console.debug(response);
-    setConfig(response.data);
 
-    switch (response.data.api) {
+    switch (activeConfig.transcription.api) {
       case 'azure': {
         const { default: createSpeechServicesPonyfill } = await import(
           'web-speech-cognitive-services'
@@ -309,17 +311,18 @@ export default function Editor() {
         const { SpeechRecognition: AzureSpeechRecognition } =
           createSpeechServicesPonyfill({
             credentials: {
-              region: response.data.azure_region,
-              authorizationToken: response.data.azure_token,
+              region: activeConfig.transcription.azure_region,
+              authorizationToken: response.data.azureToken,
             },
-            speechRecognitionEndpointId: response.data.azure_endpoint_id
-              ? response.data.azure_endpoint_id
+            speechRecognitionEndpointId: activeConfig.transcription
+              .azure_endpoint_id
+              ? activeConfig.transcription.azure_endpoint_id
               : undefined,
           });
         SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
-        setAllowedLanguages(filterLanguages(response.data.azure_languages));
-        setCurrentLanguage(response.data.language);
-        console.debug(locale.getByTag(response.data.language));
+        setAllowedLanguages(filterLanguages(response.data.azureLanguages));
+        setCurrentLanguage(activeConfig.transcription.language);
+        console.debug(locale.getByTag(activeConfig.transcription.language));
         console.log('Initialized Azure Speech Services');
         break;
       }
@@ -332,8 +335,8 @@ export default function Editor() {
         const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
           response.data.speechly_app
         );
-        setAllowedLanguages([DEFAULT_CONFIG.language]);
-        setCurrentLanguage(DEFAULT_CONFIG.language);
+        setAllowedLanguages([CONFIG_SETTINGS.transcription.defaults.language]);
+        setCurrentLanguage(CONFIG_SETTINGS.transcription.defaults.language);
         SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
         console.log('Initialized Speechly');
         break;
@@ -360,21 +363,19 @@ export default function Editor() {
     });
   }
 
-  function openClient() {
-    window.open(`http://${config.server_ip}:${config.client_port}/`);
-  }
-
   async function loadPage() {
-    await getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
+    Object.keys(activeConfig).forEach((key) => {
+      getConfig(key, setActiveConfig);
+    });
 
     console.debug(`Detected locale: ${getUserLocale()}`);
   }
 
-  async function openConfig(panel) {
+  async function getConfig(configType, updateFunction) {
     let response;
     try {
       response = await SERVER_CLIENT.get('/config', {
-        params: { room: room },
+        params: { config: configType },
       });
     } catch (error) {
       console.log(error);
@@ -382,9 +383,19 @@ export default function Editor() {
       return null;
     }
 
-    console.debug(response);
-    setUpdateConfig(response.data);
+    console.debug(response.data);
 
+    const newConfig = {};
+    newConfig[configType] = response.data;
+    updateFunction((prev) => {
+      return { ...prev, ...newConfig };
+    });
+
+    return response.data;
+  }
+
+  async function openConfig(panel) {
+    await getConfig(panel, setChangedConfig);
     configPanel(panel, true);
   }
 
@@ -396,22 +407,33 @@ export default function Editor() {
     });
   }
 
-  async function saveConfig(panel, logoff = false) {
+  async function postConfig(configType, configObject) {
+    console.log(configObject);
     try {
-      await SERVER_CLIENT.post('/config', updateConfig);
+      await SERVER_CLIENT.post('/config', {
+        type: configType,
+        config: configObject,
+      });
     } catch (error) {
       console.log(error);
       alert('Could not save config.');
       return null;
     }
+  }
 
-    setMaxLines(updateConfig.max_lines);
+  async function saveConfig(panel, logoff = false) {
+    await postConfig(panel, changedConfig[panel]);
+
+    const newConfig = {};
+    newConfig[panel] = changedConfig[panel];
+    setActiveConfig((prev) => {
+      return { ...prev, ...newConfig };
+    });
+
     configPanel(panel, false);
 
     if (logoff) {
       setLoggedIn(false);
-    } else {
-      setConfig(updateConfig);
     }
   }
 
@@ -492,12 +514,6 @@ export default function Editor() {
           <List>
             <AppMenuItem
               disabled={!loggedIn || !browserSupportsSpeechRecognition}
-              onClick={openClient}
-              icon={<OpenInNewIcon />}
-              text="Open Viewer"
-            />
-            <AppMenuItem
-              disabled={!loggedIn || !browserSupportsSpeechRecognition}
               onClick={downloadTranscript}
               icon={<DownloadIcon />}
               text="Download"
@@ -514,45 +530,45 @@ export default function Editor() {
           </List>
           <Collapse in={configMenuOpen}>
             <List>
-            {loggedIn && config && config.api === 'azure' && (
-              <ListItem key="language">
-                <ListItemIcon>
-                  <LanguageIcon
-                    color={languageChangeAllowed() ? 'inherit' : 'disabled'}
-                  />
-                </ListItemIcon>
-                <ListItemText>
-                  <Select
-                    value={currentLanguage}
-                    disabled={!languageChangeAllowed()}
-                    label="Language"
-                    variant="standard"
-                    onChange={(e) => {
-                      setCurrentLanguage(e.target.value);
-                    }}
-                    fullWidth
-                  >
-                    {allowedLanguages.map((item) => {
-                      const loc = locale.getByTag(item);
-                      const allowed =
-                        config.allowed_languages.length === 0
-                          ? true
-                          : config.allowed_languages.includes(item);
-                      if (
-                        loc &&
-                        loc['iso639-1'] in BadWordsDictionaries &&
-                        allowed
-                      )
-                        return (
-                          <MenuItem value={item} key={item}>
-                            {loc.name} ({loc.location})
-                          </MenuItem>
-                        );
-                    })}
-                  </Select>
-                </ListItemText>
-              </ListItem>
-            )}
+              {loggedIn && activeConfig.transcription.api === 'azure' && (
+                <ListItem key="language">
+                  <ListItemIcon>
+                    <LanguageIcon
+                      color={languageChangeAllowed() ? 'inherit' : 'disabled'}
+                    />
+                  </ListItemIcon>
+                  <ListItemText>
+                    <Select
+                      value={currentLanguage}
+                      disabled={!languageChangeAllowed()}
+                      label="Language"
+                      variant="standard"
+                      onChange={(e) => {
+                        setCurrentLanguage(e.target.value);
+                      }}
+                      fullWidth
+                    >
+                      {allowedLanguages.map((item) => {
+                        const loc = locale.getByTag(item);
+                        const allowed =
+                        activeConfig.transcription.allowed_languages.length === 0
+                            ? true
+                            : activeConfig.transcription.allowed_languages.includes(item);
+                        if (
+                          loc &&
+                          loc['iso639-1'] in BadWordsDictionaries &&
+                          allowed
+                        )
+                          return (
+                            <MenuItem value={item} key={item}>
+                              {loc.name} ({loc.location})
+                            </MenuItem>
+                          );
+                      })}
+                    </Select>
+                  </ListItemText>
+                </ListItem>
+              )}
               <ListItem>
                 <ListItemText>Font Size: ({size})</ListItemText>
               </ListItem>
@@ -580,7 +596,7 @@ export default function Editor() {
               />
               <AppMenuItem
                 disabled={wantListen}
-                onClick={() => openConfig('advanced')}
+                onClick={() => openConfig('app')}
                 icon={<SettingsIcon />}
                 text="Advanced Settings"
               />
@@ -620,9 +636,11 @@ export default function Editor() {
         </Box>
 
         <TranscriptionSettings
-          open={dialogs.transcription}
-          config={config}
-          updateConfig={updateConfig}
+          configType="transcription"
+          open={dialogs}
+          config={activeConfig}
+          updateConfig={changedConfig}
+          loggedIn={loggedIn}
           onChangeFunction={changeConfigValue}
           onCancel={() => configPanel('transcription', false)}
           onSave={() => saveConfig('transcription', true)}
@@ -631,19 +649,21 @@ export default function Editor() {
         />
 
         <DisplaySettings
-          open={dialogs.display}
-          updateConfig={updateConfig}
+          configType="display"
+          open={dialogs}
+          updateConfig={changedConfig}
           onChangeFunction={changeConfigValue}
           onCancel={() => configPanel('display', false)}
-          onSave={() => saveConfig('display', true)}
+          onSave={() => saveConfig('display', false)}
         />
 
         <AdvancedSettings
-          open={dialogs.advanced}
-          updateConfig={updateConfig}
+          configType="app"
+          open={dialogs}
+          updateConfig={changedConfig}
           onChangeFunction={changeConfigValue}
-          onCancel={() => configPanel('advanced', false)}
-          onSave={() => saveConfig('advanced', true)}
+          onCancel={() => configPanel('app', false)}
+          onSave={() => saveConfig('app', true)}
         />
       </Box>
     </ThemeProvider>

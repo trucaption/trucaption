@@ -1,8 +1,8 @@
 {
   "name": "@trucaption/common",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "description": "Computer-aided realtime transcription",
-  "exports": "./src/index.js",
+  "exports": "./src/index.mjs",
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later"
 }

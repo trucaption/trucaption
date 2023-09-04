@@ -31,24 +31,26 @@ import { baseTheme } from './Common.mjs';
 export default function App() {
   const searchParams = new URLSearchParams(document.location.search);
 
-  const [editorUrl, setEditorUrl] = useState(
-    searchParams.has('editorUrl') ? searchParams.get('editorUrl') : ''
-  );
-  const [editorPort, setEditorPort] = useState(
-    searchParams.has('editorPort') ? searchParams.get('editorPort') : ''
-  );
-  const [viewerPort, setViewerPort] = useState(
-    searchParams.has('viewerPort') ? searchParams.get('viewerPort') : ''
-  );
-  const [appVersion, setAppVersion] = useState(
-    searchParams.has('version') ? searchParams.get('version') : ''
-  );
+  const queryParams = {
+    editorPort: searchParams.has('editorPort') ? searchParams.get('editorPort') : '',
+    viewerPort: searchParams.has('viewerPort') ? searchParams.get('viewerPort') : '',
+    appVersion: searchParams.has('version') ? searchParams.get('version') : '',
+    viewerIP: searchParams.has('viewerIP') ? searchParams.get('viewerIP') : ''
+  }
+
+  const urls = {
+    editorURL: `http://localhost:${queryParams.editorPort}/`,
+    viewerURL: `http://${queryParams.viewerIP}:${queryParams.viewerPort}/`,
+  }
+
+  const [settings, setSettings] = useState({ ...queryParams, ...urls});
+
   const [updateState, setUpdateState] = useState('Unknown');
 
   const versionOptions = {
     repo: 'trucaption',
     owner: 'dkaser',
-    currentVersion: searchParams.has('version') ? searchParams.get('version') : '',
+    currentVersion: queryParams.appVersion,
   };
 
   const drawerWidth = 300;
@@ -95,26 +97,34 @@ export default function App() {
           </List>
           <List>
             <ListItem disablePadding>
-              <ListItemButton component="a" href={editorUrl} target="_blank">
+              <ListItemButton component="a" href={settings.editorURL} target="_blank">
                 <ListItemIcon>
                   <OpenInNewIcon />
                 </ListItemIcon>
                 <ListItemText>Open Editor</ListItemText>
               </ListItemButton>
             </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton component="a" href={settings.viewerURL} target="_blank">
+                <ListItemIcon>
+                  <OpenInNewIcon />
+                </ListItemIcon>
+                <ListItemText>Open Viewer</ListItemText>
+              </ListItemButton>
+            </ListItem>
           </List>
           <Divider />
           <List>
             <ListItem>
-              <ListItemText>Editor Port: {editorPort}</ListItemText>
+              <ListItemText>Editor Port: {settings.editorPort}</ListItemText>
             </ListItem>
             <ListItem>
-              <ListItemText>Viewer Port: {viewerPort}</ListItemText>
+              <ListItemText>Viewer Port: {settings.viewerPort}</ListItemText>
             </ListItem>
           </List>
           <List style={{ marginTop: 'auto' }} >
             <ListItem>
-              <ListItemText>Version: {appVersion}</ListItemText>
+              <ListItemText>Version: {settings.appVersion}</ListItemText>
             </ListItem>
             <ListItem>
               <ListItemText>Update: {updateState}</ListItemText>

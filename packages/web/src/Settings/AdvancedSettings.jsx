@@ -3,7 +3,7 @@ import { DialogContentText, TextField } from '@mui/material';
 import SettingsDialog from './SettingsDialog';
 
 export default function AdvancedSettings(props) {
-  const { updateConfig, onChangeFunction } = props;
+  const { configType, updateConfig, onChangeFunction } = props;
   return (
     <SettingsDialog {...props} title="Advanced Settings">
       <DialogContentText sx={{ fontWeight: 'bold' }}>Ports</DialogContentText>
@@ -13,10 +13,10 @@ export default function AdvancedSettings(props) {
         variant="standard"
         fullWidth
         type="number"
-        value={updateConfig.controller_port}
+        value={updateConfig[configType].editor_port}
         required
         onChange={(event) =>
-          onChangeFunction('controller_port', event.target.value)
+          onChangeFunction(configType, 'editor_port', event.target.value)
         }
       />
       <TextField
@@ -25,10 +25,10 @@ export default function AdvancedSettings(props) {
         variant="standard"
         fullWidth
         type="number"
-        value={updateConfig.client_port}
+        value={updateConfig[configType].viewer_port}
         required
         onChange={(event) =>
-          onChangeFunction('client_port', event.target.value)
+          onChangeFunction(configType, 'viewer_port', event.target.value)
         }
       />
       <DialogContentText>

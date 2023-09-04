@@ -4,7 +4,8 @@
   "version": "1.2.0",
   "description": "Computer-aided real-time captioning",
   "scripts": {
-    "build": "yarn workspace @trucaption/web build",
+    "build": "yarn workspace @trucaption/web build && yarn start",
+    "test": "yarn workspace @trucaption/web test && yarn start",
     "make:win": "yarn workspace trucaption make:win",
     "make:darwin": "yarn workspace trucaption make:darwin",
     "make:linux": "yarn workspace trucaption make:linux",

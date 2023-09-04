@@ -3,7 +3,7 @@ import { FormControlLabel, Switch, TextField } from '@mui/material';
 import SettingsDialog from './SettingsDialog';
 
 export default function DisplaySettings(props) {
-  const { updateConfig, onChangeFunction } = props;
+  const { configType, updateConfig, onChangeFunction } = props;
 
   return (
     <SettingsDialog {...props} title="Display Settings">
@@ -13,9 +13,11 @@ export default function DisplaySettings(props) {
         variant="standard"
         fullWidth
         type="number"
-        value={updateConfig.max_lines}
+        value={updateConfig[configType].max_lines}
         required
-        onChange={(event) => onChangeFunction('max_lines', event.target.value)}
+        onChange={(event) =>
+          onChangeFunction(configType, 'max_lines', event.target.value)
+        }
       />
       <TextField
         label="Default Font Size"
@@ -23,16 +25,18 @@ export default function DisplaySettings(props) {
         variant="standard"
         fullWidth
         type="number"
-        value={updateConfig.font_size}
+        value={updateConfig[configType].font_size}
         required
-        onChange={(event) => onChangeFunction('font_size', event.target.value)}
+        onChange={(event) =>
+          onChangeFunction(configType, 'font_size', event.target.value)
+        }
       />
       <FormControlLabel
         control={
           <Switch
-            checked={updateConfig.clear_temp_on_stop}
+            checked={updateConfig[configType].clear_temp_on_stop}
             onChange={(event) =>
-              onChangeFunction('clear_temp_on_stop', event.target.checked)
+              onChangeFunction(configType, 'clear_temp_on_stop', event.target.checked)
             }
           />
         }
@@ -41,9 +45,9 @@ export default function DisplaySettings(props) {
       <FormControlLabel
         control={
           <Switch
-            checked={updateConfig.word_filter}
+            checked={updateConfig[configType].word_filter}
             onChange={(event) =>
-              onChangeFunction('word_filter', event.target.checked)
+              onChangeFunction(configType, 'word_filter', event.target.checked)
             }
           />
         }
@@ -52,9 +56,9 @@ export default function DisplaySettings(props) {
       <FormControlLabel
         control={
           <Switch
-            checked={updateConfig.all_caps}
+            checked={updateConfig[configType].all_caps}
             onChange={(event) =>
-              onChangeFunction('all_caps', event.target.checked)
+              onChangeFunction(configType, 'all_caps', event.target.checked)
             }
           />
         }
