@@ -3,6 +3,7 @@ module.exports = {
     asar: true,
     derefSymlinks: true,
     icon: 'build/icon',
+    name: "Trucaption",
     osxSign: {
       optionsForFile: (filePath) => {
         return {

@@ -1,6 +1,6 @@
 {
   "name": "@trucaption/web",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "description": "Computer-aided realtime transcription",
   "scripts": {
     "build": "npm run check && webpack --mode production",
