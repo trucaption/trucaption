@@ -12,7 +12,10 @@ async function run()
   });
 }
 
-if (require('electron-squirrel-startup')) app.quit();
+if (require('electron-squirrel-startup')) {
+  log.log("Qutting for electron-squirrel-startup");
+  app.quit();
+}
 
 require('update-electron-app')({
   logger: log,
