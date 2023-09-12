@@ -4,17 +4,9 @@
   "description": "Computer-aided real-time captioning",
   "main": "src/server.cjs",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make:darwin": "yarn run make:darwin-x64 && yarn run make:darwin-arm64",
-    "make:darwin-x64": "electron-forge make --platform=darwin --arch=x64",
-    "make:darwin-arm64": "electron-forge make --platform=darwin --arch=arm64",
-    "make:win": "yarn run make:win-x64 && yarn run make:win-arm64",
-    "make:win-x64": "electron-forge make --platform=win32 --arch=x64",
-    "make:win-arm64": "electron-forge make --platform=win32 --arch=arm64",
-    "make:linux": "yarn run make:linux-x64 && yarn run make:linux-arm64",
-    "make:linux-arm64": "electron-forge make --platform=linux --arch=arm64",
-    "make:linux-x64": "electron-forge make --platform=linux --arch=x64"
+    "start": "electron .",
+    "package": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "keywords": [
     "captions",
@@ -28,23 +20,23 @@
     "@trucaption/common": "workspace:^",
     "axios": "^0.27.2",
     "electron-log": "^4.4.8",
-    "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^6.1.4",
     "express": "^4.18.2",
     "express-static-gzip": "^2.1.7",
     "ip": "^1.1.8",
-    "socket.io": "^4.7.2",
-    "update-electron-app": "^2.0.1"
+    "socket.io": "^4.7.2"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.4.1",
-    "@electron-forge/maker-deb": "^6.4.1",
-    "@electron-forge/maker-dmg": "^6.4.1",
-    "@electron-forge/maker-rpm": "^6.4.1",
-    "@electron-forge/maker-snap": "^6.4.1",
-    "@electron-forge/maker-squirrel": "^6.4.1",
-    "@electron-forge/maker-zip": "^6.4.1",
-    "@electron-forge/plugin-auto-unpack-natives": "^6.4.1",
     "cross-conf-env": "^1.3.0",
-    "electron": "26.1.0"
+    "electron": "26.1.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.trucaption",
+    "asar": false,
+    "productName": "Trucaption",
+    "win": {
+      "certificateSubjectName": "Open Source Developer, Derek Kaser"
+    }
   }
 }

@@ -12,9 +12,4 @@ async function run()
   });
 }
 
-if (require('electron-squirrel-startup')) {
-  log.log("Qutting for electron-squirrel-startup");
-  app.quit();
-}
-
 run();
