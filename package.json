@@ -1,7 +1,7 @@
 {
   "name": "@trucaption/repo",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Computer-aided real-time captioning",
   "scripts": {
     "build": "yarn workspace @trucaption/web build && yarn start",

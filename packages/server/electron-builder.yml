@@ -3,6 +3,8 @@ appId: com.trucaption
 asar: false
 forceCodeSigning: true
 productName: Trucaption
+files:
+  - "!electron-builder.env"
 win:
   certificateSubjectName: Open Source Developer, Derek Kaser
   target:
