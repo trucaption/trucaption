@@ -7,6 +7,8 @@
 import { app, BrowserWindow, shell } from 'electron';
 import log from 'electron-log';
 
+import electronUpdater from "electron-updater"
+
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
 
@@ -48,6 +50,8 @@ function createWindow() {
     shell.openExternal(url);
     return { action: 'deny' };
   });
+
+  electronUpdater.autoUpdater.checkForUpdatesAndNotify();
 }
 
 function saveConfigToDisk(configType) {
