@@ -10,3 +10,5 @@ vendor
 yarn.lock
 .yarn
 packages/server/out
+.env
+electron-builder.env
