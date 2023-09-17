@@ -195,7 +195,6 @@ export default function Editor() {
       const cleanTranscript = applyTextEffects(interimTranscript);
 
       setTempTranscript(cleanTranscript);
-      sendMessage(JSON.stringify({"text": cleanTranscript}), 'temp');
     }
   }
 
@@ -203,8 +202,13 @@ export default function Editor() {
     fileDownload(Object.values(sentTranscript).join('\n'), 'transcript.txt');
   }
 
+  function sendTempTranscript() {
+    sendMessage(JSON.stringify({"text": tempTranscript}), 'temp');
+  }
+
   useEffect(onFinalTranscript, [finalTranscript]);
   useEffect(onInterimTranscript, [interimTranscript]);
+  useEffect(sendTempTranscript, [tempTranscript]);
 
   const endRef = useRef(null);
   useEffect(() => {
