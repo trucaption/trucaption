@@ -18,6 +18,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  MenuItem,
+  Select,
   Slider,
   Typography,
 } from '@mui/material';
@@ -26,15 +28,21 @@ import { ThemeProvider } from '@mui/material/styles';
 import Logo from '../assets/logo.png';
 import Image from 'mui-image';
 
+import LanguageIcon from '@mui/icons-material/Language';
+
 import axios from 'axios';
+import locale from 'locale-codes';
+
+import { io } from 'socket.io-client';
 
 import {
   autoScroll,
   baseTheme,
   getDisplayTheme,
-  getSettings,
   trimTranscript,
 } from './Common.mjs';
+
+import { CONFIG_SETTINGS } from '@trucaption/common';
 
 const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
 
@@ -46,16 +54,20 @@ export default function Viewer() {
   const [tempTranscript, setTempTranscript] = useState('Loading...');
   const [transcript, setTranscript] = useState(new Object());
   const [size, setSize] = useState(20);
-  const [room, setRoom] = useState('');
+  const [room, setRoom] = useState('default');
   const [open, setOpen] = useState(false);
-  const [maxLines, setMaxLines] = useState(null);
+  const [maxLines, setMaxLines] = useState(
+    CONFIG_SETTINGS.display.defaults.max_lines
+  );
+  const [socket, setSocket] = useState(null);
+  const [translation, setTranslation] = useState(
+    CONFIG_SETTINGS.translation.defaults
+  );
 
   const searchParams = new URLSearchParams(document.location.search);
   const noSidebar = searchParams.has('fullscreen');
 
   const drawerWidth = 240;
-
-  if (searchParams.has('room')) setRoom(searchParams.get('room'));
 
   const endRef = useRef(null);
   useEffect(() => {
@@ -70,13 +82,14 @@ export default function Viewer() {
     setTranscript((prev) => trimTranscript(prev, lineChange, maxLines));
   }
 
+  function onTemp(message) {
+    const { text } = JSON.parse(message);
+    setTempTranscript(text);
+  }
+
   function onReset(message) {
     setTranscript(new Object());
     setTempTranscript('');
-  }
-
-  function onLines(lines) {
-    setMaxLines(lines);
   }
 
   function onConnect() {
@@ -89,108 +102,169 @@ export default function Viewer() {
   }
 
   async function initializeSocket() {
-    const { io } = await import('socket.io-client');
+    setTempTranscript('');
+    setTranscript({});
 
-    const socket = io(`/${room}`, {
+    console.log(`Configuring socket.io for namespace: /${room}`);
+
+    if (socket) {
+      socket.off();
+      socket.close();
+    }
+
+    const newSocket = io(`/${room}`, {
       autoConnect: false,
     });
 
-    socket.on('connect', onConnect);
-    socket.on('connect_error', () => console.log('Connection error.'));
+    newSocket.on('connect', onConnect);
+    newSocket.on('connect_error', () => console.log('Connection error.'));
 
-    socket.on('final', (arg) => onFinal(arg, maxLines));
-    socket.on('temp', (arg) => setTempTranscript(arg));
-    socket.on('reset', (arg) => onReset(arg));
-    socket.on('config', onLines());
+    newSocket.on('final', (arg) => onFinal(arg, maxLines));
+    newSocket.on('temp', (arg) => onTemp(arg));
+    newSocket.on('reset', (arg) => onReset(arg));
+    newSocket.on('config', loadConfig());
 
-    while (!socket.connected) {
+    setSocket(newSocket);
+
+    while (!newSocket.connected) {
       console.log('Attempting connection.');
-      socket.open();
+      newSocket.open();
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   }
 
-  async function loadPage() {
-    getSettings(SERVER_CLIENT, searchParams, setSize, setMaxLines);
+  async function loadConfig(firstLoad = false) {
+    const response = await SERVER_CLIENT.get('/defaults');
+
+    console.debug('Received configuration data:');
+    console.debug(response.data);
+
+    setMaxLines(response.data.max_lines);
+    setTranslation(response.data.translation);
+
+    if (firstLoad) {
+      console.debug('First load -- processing searchParams');
+
+      if (searchParams.has('language')) {
+        setRoom(searchParams.get('language'));
+      }
+
+      if (searchParams.has('size')) {
+        const fixedSize = searchParams.get('size');
+        if (!isNaN(fixedSize)) {
+          console.log('Setting fixed size');
+          setSize(fixedSize);
+        }
+      } else {
+        setSize(response.data.font_size);
+      }
+    }
   }
 
   // Load page
   useEffect(() => {
-    loadPage();
+    loadConfig(true);
   }, []);
 
   useEffect(() => {
-    if (maxLines !== null) {
-      initializeSocket();
-    }
-  }, [maxLines]);
+    console.log(`Applying maxLines: ${maxLines}`);
+    console.log(`Applying room: ${room}`);
 
-  function Sidebar() {
-    if (noSidebar) return null;
-
-    return (
-      <>
-        <Fab
-          onClick={toggleSidebar}
-          style={{ position: 'fixed', top: 16, right: 16 }}
-          size="medium"
-          sx={{ ...(open && { display: 'none' }) }}
-        >
-          <MenuIcon />
-        </Fab>
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
-              width: drawerWidth,
-              boxSizing: 'border-box',
-            },
-          }}
-          variant="persistent"
-          anchor="right"
-          open={open}
-        >
-          <List disablePadding>
-            <ListItem disablePadding>
-              <Image src={Logo} duration={0} />
-            </ListItem>
-          </List>
-          <List>
-            <ListItem disablePadding>
-              <ListItemText>Font Size: ({size})</ListItemText>
-            </ListItem>
-            <ListItem>
-              <Slider
-                aria-label="Size"
-                value={size}
-                onChange={(e, newValue) => {
-                  setSize(newValue);
-                }}
-              />
-            </ListItem>
-          </List>
-          <Divider />
-          <List>
-            <ListItem key="Start" disablePadding>
-              <ListItemButton onClick={toggleSidebar}>
-                <ListItemIcon>
-                  <MenuIcon />
-                </ListItemIcon>
-                <ListItemText>Close</ListItemText>
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Drawer>
-      </>
-    );
-  }
+    initializeSocket();
+  }, [maxLines, room]);
 
   return (
     <ThemeProvider theme={baseTheme}>
       <Box sx={{ display: 'flow' }}>
         <CssBaseline />
-        <Sidebar />
+        {!noSidebar && (
+          <>
+            <Fab
+              onClick={toggleSidebar}
+              style={{ position: 'fixed', top: 16, right: 16 }}
+              size="medium"
+              sx={{ ...(open && { display: 'none' }) }}
+            >
+              <MenuIcon />
+            </Fab>
+            <Drawer
+              sx={{
+                width: drawerWidth,
+                flexShrink: 0,
+                '& .MuiDrawer-paper': {
+                  width: drawerWidth,
+                  boxSizing: 'border-box',
+                },
+              }}
+              variant="persistent"
+              anchor="right"
+              open={open}
+            >
+              <List disablePadding>
+                <ListItem disablePadding>
+                  <Image src={Logo} duration={0} />
+                </ListItem>
+              </List>
+              {translation.enabled && (
+                <List>
+                  <ListItem key="language">
+                    <ListItemIcon>
+                      <LanguageIcon />
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Select
+                        value={room}
+                        label="Language"
+                        variant="standard"
+                        onChange={(e) => {
+                          setRoom(e.target.value);
+                        }}
+                        fullWidth
+                      >
+                        <MenuItem value="default" key="default">
+                          Default
+                        </MenuItem>
+                        {translation.languages.map((item) => {
+                          const loc = locale.getByTag(item);
+                          return (
+                            <MenuItem value={item} key={item}>
+                              {loc.name}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </ListItemText>
+                  </ListItem>
+                </List>
+              )}
+              <List>
+                <ListItem disablePadding>
+                  <ListItemText>Font Size: ({size})</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <Slider
+                    aria-label="Size"
+                    value={size}
+                    onChange={(e, newValue) => {
+                      setSize(newValue);
+                    }}
+                  />
+                </ListItem>
+              </List>
+              <Divider />
+              <List>
+                <ListItem key="Close" disablePadding>
+                  <ListItemButton onClick={toggleSidebar}>
+                    <ListItemIcon>
+                      <MenuIcon />
+                    </ListItemIcon>
+                    <ListItemText>Close</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </Drawer>
+          </>
+        )}
         <ThemeProvider theme={getDisplayTheme(size)}>
           {Object.keys(transcript).map((key) => {
             return (

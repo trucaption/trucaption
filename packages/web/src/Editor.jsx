@@ -22,6 +22,7 @@ import AppMenuItem from './Menu/AppMenuItem';
 import AdvancedSettings from './Settings/AdvancedSettings';
 import DisplaySettings from './Settings/DisplaySettings';
 import TranscriptionSettings from './Settings/TranscriptionSettings';
+import TranslationSettings from './Settings/TranslationSettings';
 
 import locale from 'locale-codes';
 
@@ -64,7 +65,6 @@ import {
   autoScroll,
   baseTheme,
   getDisplayTheme,
-  getSettings,
   trimTranscript,
 } from './Common.mjs';
 
@@ -79,7 +79,6 @@ const SERVER_CLIENT = axios.create({
 
 export default function Editor() {
   const [size, setSize] = useState(20);
-  const [room, setRoom] = useState('');
 
   const [activeConfig, setActiveConfig] = useState(getDefaultsObject());
   const [changedConfig, setChangedConfig] = useState(getDefaultsObject());
@@ -123,7 +122,6 @@ export default function Editor() {
   function sendMessage(message, messageType = 'final') {
     try {
       const payload = {
-        room: room,
         queue: messageType,
         data: message,
         language: currentLanguage,
@@ -197,7 +195,7 @@ export default function Editor() {
       const cleanTranscript = applyTextEffects(interimTranscript);
 
       setTempTranscript(cleanTranscript);
-      sendMessage(cleanTranscript, 'temp');
+      sendMessage(JSON.stringify({"text": cleanTranscript}), 'temp');
     }
   }
 
@@ -589,6 +587,12 @@ export default function Editor() {
                 text="Transcription Engine"
               />
               <AppMenuItem
+                disabled={wantListen}
+                onClick={() => openConfig('translation')}
+                icon={<LanguageIcon />}
+                text="Translation Settings"
+              />
+              <AppMenuItem
                 disabled={false}
                 onClick={() => openConfig('display')}
                 icon={<MonitorIcon />}
@@ -646,6 +650,15 @@ export default function Editor() {
           onSave={() => saveConfig('transcription', true)}
           currentLanguage={currentLanguage}
           allowedLanguages={allowedLanguages}
+        />
+
+        <TranslationSettings
+          configType="translation"
+          open={dialogs}
+          updateConfig={changedConfig}
+          onChangeFunction={changeConfigValue}
+          onCancel={() => configPanel('translation', false)}
+          onSave={() => saveConfig('translation', false)}
         />
 
         <DisplaySettings

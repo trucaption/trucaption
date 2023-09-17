@@ -7,30 +7,6 @@
 import CmgSansWoff2 from '../assets/CMGSans-Regular.woff2';
 import { createTheme } from '@mui/material/styles/index.js';
 
-export async function getSettings(
-  SERVER_CLIENT,
-  searchParams,
-  setSize,
-  setMaxLines
-) {
-  const response = await SERVER_CLIENT.get('/defaults');
-
-  console.debug('Received configuration data:');
-  console.debug(response.data);
-
-  setMaxLines(response.data.max_lines);
-
-  if (searchParams.has('size')) {
-    const fixedSize = searchParams.get('size');
-    if (!isNaN(fixedSize)) {
-      console.log('Setting fixed size');
-      setSize(fixedSize);
-    }
-  } else {
-    setSize(response.data.font_size);
-  }
-}
-
 export const baseTheme = createTheme({
   palette: {
     mode: 'dark',

@@ -34,6 +34,7 @@ export const configSettings = {
   translation: {
     defaults: {
       enabled: false,
+      interim: false,
       languages: [],
       api: 'google',
       key: '',

@@ -7,7 +7,7 @@
 import { app, BrowserWindow, shell } from 'electron';
 import log from 'electron-log';
 
-import electronUpdater from "electron-updater"
+import electronUpdater from 'electron-updater';
 
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
@@ -27,6 +27,9 @@ import ip from 'ip';
 import querystring from 'querystring';
 
 import { createServer } from 'http';
+
+import locale from 'locale-codes';
+import translate from 'translate';
 
 const config = {};
 var clientIo = null;
@@ -116,6 +119,9 @@ export async function runServer(__dirname) {
   controllerApp.post('/config', postConfig);
 
   controllerApp.post('/message', postMessage);
+
+  clientIo.of(`/default`);
+  setupTranslation();
 
   createWindow();
 
@@ -207,7 +213,7 @@ async function getConnect(request, response) {
 
     response.send(responseJson);
   } catch (error) {
-    log.log(`${error.message}`);
+    log.error(`${error.message}`);
     response.status(500).end();
   }
 }
@@ -245,6 +251,10 @@ function postConfig(request, response) {
     Object.assign(config[request.body.type], newConfig);
     saveConfigToDisk(request.body.type);
     response.status(201).end();
+
+    if (request.body.type === 'translation') {
+      setupTranslation();
+    }
   } catch (error) {
     log.error(error);
     response.status(500).end();
@@ -253,16 +263,78 @@ function postConfig(request, response) {
 
 function postMessage(request, response) {
   try {
-    clientIo
-      .of(`/${request.body.room}`)
-      .emit(request.body.queue, request.body.data);
+    clientIo.of('/default').emit(request.body.queue, request.body.data);
     response.status(201).end();
+
+    if (
+      config.translation.enabled &&
+      (request.body.queue === 'final' ||
+        (request.body.queue === 'temp' && config.translation.interim))
+    ) {
+      for (const lang of config.translation.languages) {
+        translateMessage(
+          request.body.language,
+          lang,
+          request.body.data,
+          request.body.queue
+        );
+      }
+    }
   } catch (error) {
-    log.log(error);
+    log.error(error);
     response.status(500).end();
   }
 }
 
 function logConnection(request, message) {
   log.debug(`[${request.socket.remoteAddress}] ${message}`);
+}
+
+function setupTranslation() {
+  if (config.translation.enabled) {
+    if (config.translation.key) {
+      log.log('Enabling translation');
+      translate.engine = config.translation.api;
+      translate.key = config.translation.key;
+
+      if (config.translation.enabled) {
+        for (const lang of config.translation.languages) {
+          // Initialize namespace for language
+          clientIo.of(`/${lang}`);
+        }
+      }
+    } else {
+      log.log('Translation enabled, but key not specified -- disabling.');
+      config.translation.enabled = false;
+      saveConfigToDisk('translation');
+    }
+  } else {
+    log.log('Translation disabled.');
+  }
+}
+
+async function translateMessage(
+  currentLanguage,
+  targetLanguage,
+  message,
+  queue
+) {
+  try {
+    const current = locale.getByTag(currentLanguage);
+    const target = locale.getByTag(targetLanguage);
+
+    if (current['iso639-1'] === target['iso639-1']) {
+      clientIo.of(`/${targetLanguage}`).emit(queue, JSON.stringify(message));
+      return;
+    }
+
+    const data = JSON.parse(message);
+    if (data.text) {
+      data.text = await translate(data.text, targetLanguage);
+    }
+
+    clientIo.of(`/${targetLanguage}`).emit(queue, JSON.stringify(data));
+  } catch (error) {
+    log.error(error);
+  }
 }
