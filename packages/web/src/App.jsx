@@ -49,7 +49,7 @@ export default function App() {
 
   const versionOptions = {
     repo: 'trucaption',
-    owner: 'dkaser',
+    owner: 'trucaption',
     currentVersion: queryParams.appVersion,
   };
 
