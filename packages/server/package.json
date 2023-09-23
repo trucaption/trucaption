@@ -1,6 +1,6 @@
 {
   "name": "trucaption",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Computer-aided real-time captioning",
   "main": "src/server.cjs",
   "scripts": {
@@ -15,7 +15,7 @@
   ],
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
-  "repository": "github:dkaser/trucaption",
+  "repository": "github:trucaption/trucaption",
   "dependencies": {
     "@trucaption/common": "workspace:^",
     "axios": "^0.27.2",

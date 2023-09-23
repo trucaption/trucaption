@@ -1,7 +1,7 @@
 {
   "name": "@trucaption/repo",
   "private": true,
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Computer-aided real-time captioning",
   "scripts": {
     "build": "yarn workspace @trucaption/web build && yarn start",
@@ -17,7 +17,7 @@
   ],
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
-  "repository": "github:dkaser/trucaption",
+  "repository": "github:trucaption/trucaption",
   "workspaces": [
     "packages/*"
   ],
