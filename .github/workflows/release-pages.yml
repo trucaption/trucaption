@@ -2,6 +2,7 @@ name: "Update Web Site"
 on:
   release:
     types:
+      - created
       - published
       - edited
       - deleted
