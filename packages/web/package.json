@@ -5,8 +5,8 @@
   "scripts": {
     "build": "npm run check && webpack --mode production",
     "test": "npm run check && webpack --mode development",
-    "format": "npx rome format --write .",
-    "check": "npx rome check ."
+    "format": "npx biome format --write .",
+    "check": "npx biome check ."
   },
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",

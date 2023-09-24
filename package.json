@@ -8,7 +8,9 @@
     "test": "yarn workspace @trucaption/web test && yarn start",
     "dist": "yarn workspace trucaption dist",
     "start": "yarn workspace trucaption start",
-    "release": "yarn workspace trucaption release"
+    "release": "yarn workspace trucaption release",
+    "format": "npx biome format --write .",
+    "check": "npx biome check ."
   },
   "keywords": [
     "captions",
@@ -21,12 +23,12 @@
   "workspaces": [
     "packages/*"
   ],
-  "devDependencies": {
-    "rome": "^12.1.3"
-  },
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">= 3.6.3"
   },
-  "packageManager": "yarn@3.6.3"
+  "packageManager": "yarn@3.6.3",
+  "devDependencies": {
+    "@biomejs/biome": "^1.2.2"
+  }
 }
