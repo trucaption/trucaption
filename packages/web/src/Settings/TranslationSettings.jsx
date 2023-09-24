@@ -9,13 +9,13 @@ import {
   Stack,
   Switch,
   TextField,
-} from '@mui/material';
+} from "@mui/material";
 
-import { useState } from 'react';
+import { useState } from "react";
 
-import SettingsDialog from './SettingsDialog';
+import SettingsDialog from "./SettingsDialog";
 
-import locale from 'locale-codes';
+import locale from "locale-codes";
 
 function handleDelete(chipToDelete, allowed_languages) {
   const newArray = allowed_languages.filter((chip) => chip !== chipToDelete);
@@ -28,7 +28,7 @@ function handleDelete(chipToDelete, allowed_languages) {
 export default function TranslationSettings(props) {
   const { configType, updateConfig, onChangeFunction } = props;
 
-  const [languageSelect, setLanguageSelect] = useState('');
+  const [languageSelect, setLanguageSelect] = useState("");
   const allowedLanguages = GoogleLanguages;
 
   return (
@@ -38,7 +38,7 @@ export default function TranslationSettings(props) {
           <Switch
             checked={updateConfig[configType].enabled}
             onChange={(event) =>
-              onChangeFunction(configType, 'enabled', event.target.checked)
+              onChangeFunction(configType, "enabled", event.target.checked)
             }
           />
         }
@@ -51,7 +51,7 @@ export default function TranslationSettings(props) {
             label="Translation Engine"
             fullWidth
             onChange={(event) =>
-              onChangeFunction(configType, 'api', event.target.value)
+              onChangeFunction(configType, "api", event.target.value)
             }
           >
             <MenuItem value="google">Google</MenuItem>
@@ -65,20 +65,20 @@ export default function TranslationSettings(props) {
             required
             value={updateConfig[configType].key}
             onChange={(event) =>
-              onChangeFunction(configType, 'key', event.target.value)
+              onChangeFunction(configType, "key", event.target.value)
             }
           />
-                <FormControlLabel
-        control={
-          <Switch
-            checked={updateConfig[configType].interim}
-            onChange={(event) =>
-              onChangeFunction(configType, 'interim', event.target.checked)
+          <FormControlLabel
+            control={
+              <Switch
+                checked={updateConfig[configType].interim}
+                onChange={(event) =>
+                  onChangeFunction(configType, "interim", event.target.checked)
+                }
+              />
             }
+            label="Translate interim transcripts"
           />
-        }
-        label="Translate interim transcripts"
-      />
           <DialogContentText>Languages:</DialogContentText>
           <Stack direction="row" spacing={1}>
             {updateConfig[configType].languages.map((data) => {
@@ -89,8 +89,8 @@ export default function TranslationSettings(props) {
                     onDelete={(event) => {
                       onChangeFunction(
                         configType,
-                        'languages',
-                        handleDelete(data, updateConfig[configType].languages)
+                        "languages",
+                        handleDelete(data, updateConfig[configType].languages),
                       );
                     }}
                   />
@@ -124,8 +124,8 @@ export default function TranslationSettings(props) {
               ) {
                 onChangeFunction(
                   configType,
-                  'languages',
-                  updateConfig[configType].languages.concat(languageSelect)
+                  "languages",
+                  updateConfig[configType].languages.concat(languageSelect),
                 );
               }
             }}
@@ -139,137 +139,137 @@ export default function TranslationSettings(props) {
 }
 
 const GoogleLanguages = [
-  'af',
-  'sq',
-  'am',
-  'ar',
-  'hy',
-  'as',
-  'ay',
-  'az',
-  'bm',
-  'eu',
-  'be',
-  'bn',
-  'bho',
-  'bs',
-  'bg',
-  'ca',
-  'ceb',
-  'zh-CN',
-  'zh-TW',
-  'co',
-  'hr',
-  'cs',
-  'da',
-  'dv',
-  'doi',
-  'nl',
-  'en',
-  'eo',
-  'et',
-  'ee',
-  'fil',
-  'fi',
-  'fr',
-  'fy',
-  'gl',
-  'ka',
-  'de',
-  'el',
-  'gn',
-  'gu',
-  'ht',
-  'ha',
-  'haw',
-  'he',
-  'hi',
-  'hmn',
-  'hu',
-  'is',
-  'ig',
-  'ilo',
-  'id',
-  'ga',
-  'it',
-  'ja',
-  'jv',
-  'kn',
-  'kk',
-  'km',
-  'rw',
-  'gom',
-  'ko',
-  'kri',
-  'ku',
-  'ckb',
-  'ky',
-  'lo',
-  'la',
-  'lv',
-  'ln',
-  'lt',
-  'lg',
-  'lb',
-  'mk',
-  'mai',
-  'mg',
-  'ms',
-  'ml',
-  'mt',
-  'mi',
-  'mr',
-  'lus',
-  'mn',
-  'my',
-  'ne',
-  'no',
-  'ny',
-  'or',
-  'om',
-  'ps',
-  'fa',
-  'pl',
-  'pt',
-  'pa',
-  'qu',
-  'ro',
-  'ru',
-  'sm',
-  'sa',
-  'gd',
-  'nso',
-  'sr',
-  'st',
-  'sn',
-  'sd',
-  'si',
-  'sk',
-  'sl',
-  'so',
-  'es',
-  'su',
-  'sw',
-  'sv',
-  'tl',
-  'tg',
-  'ta',
-  'tt',
-  'te',
-  'th',
-  'ti',
-  'ts',
-  'tr',
-  'tk',
-  'ak',
-  'uk',
-  'ur',
-  'ug',
-  'uz',
-  'vi',
-  'cy',
-  'xh',
-  'yi',
-  'yo',
-  'zu',
+  "af",
+  "sq",
+  "am",
+  "ar",
+  "hy",
+  "as",
+  "ay",
+  "az",
+  "bm",
+  "eu",
+  "be",
+  "bn",
+  "bho",
+  "bs",
+  "bg",
+  "ca",
+  "ceb",
+  "zh-CN",
+  "zh-TW",
+  "co",
+  "hr",
+  "cs",
+  "da",
+  "dv",
+  "doi",
+  "nl",
+  "en",
+  "eo",
+  "et",
+  "ee",
+  "fil",
+  "fi",
+  "fr",
+  "fy",
+  "gl",
+  "ka",
+  "de",
+  "el",
+  "gn",
+  "gu",
+  "ht",
+  "ha",
+  "haw",
+  "he",
+  "hi",
+  "hmn",
+  "hu",
+  "is",
+  "ig",
+  "ilo",
+  "id",
+  "ga",
+  "it",
+  "ja",
+  "jv",
+  "kn",
+  "kk",
+  "km",
+  "rw",
+  "gom",
+  "ko",
+  "kri",
+  "ku",
+  "ckb",
+  "ky",
+  "lo",
+  "la",
+  "lv",
+  "ln",
+  "lt",
+  "lg",
+  "lb",
+  "mk",
+  "mai",
+  "mg",
+  "ms",
+  "ml",
+  "mt",
+  "mi",
+  "mr",
+  "lus",
+  "mn",
+  "my",
+  "ne",
+  "no",
+  "ny",
+  "or",
+  "om",
+  "ps",
+  "fa",
+  "pl",
+  "pt",
+  "pa",
+  "qu",
+  "ro",
+  "ru",
+  "sm",
+  "sa",
+  "gd",
+  "nso",
+  "sr",
+  "st",
+  "sn",
+  "sd",
+  "si",
+  "sk",
+  "sl",
+  "so",
+  "es",
+  "su",
+  "sw",
+  "sv",
+  "tl",
+  "tg",
+  "ta",
+  "tt",
+  "te",
+  "th",
+  "ti",
+  "ts",
+  "tr",
+  "tk",
+  "ak",
+  "uk",
+  "ur",
+  "ug",
+  "uz",
+  "vi",
+  "cy",
+  "xh",
+  "yi",
+  "yo",
+  "zu",
 ];

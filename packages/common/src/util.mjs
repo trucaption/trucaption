@@ -5,7 +5,7 @@ export function freeze(obj) {
 }
 
 function deepFreeze(obj) {
-  if (typeof obj === 'object') {
+  if (typeof obj === "object") {
     Object.freeze(obj);
     Object.values(obj).forEach(deepFreeze);
   }

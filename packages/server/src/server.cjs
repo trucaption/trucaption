@@ -1,9 +1,7 @@
+const { app } = require("electron");
+const log = require("electron-log");
 
-const { app } = require('electron');
-const log = require('electron-log');
-
-async function run()
-{
+async function run() {
   const { runServer } = await import("./server.mjs");
   await app.whenReady();
 

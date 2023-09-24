@@ -4,12 +4,12 @@
     @license GPL-3.0-or-later
 */
 
-import CmgSansWoff2 from '../assets/CMGSans-Regular.woff2';
-import { createTheme } from '@mui/material/styles/index.js';
+import CmgSansWoff2 from "../assets/CMGSans-Regular.woff2";
+import { createTheme } from "@mui/material/styles/index.js";
 
 export const baseTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
   },
   components: {
     MuiCssBaseline: {
@@ -29,20 +29,20 @@ export const baseTheme = createTheme({
 export function getDisplayTheme(size) {
   return createTheme({
     palette: {
-      mode: 'dark',
+      mode: "dark",
     },
     typography: {
       fontSize: size,
-      fontFamily: 'CMG Sans, Roboto',
+      fontFamily: "CMG Sans, Roboto",
     },
     components: {
       MuiInput: {
         styleOverrides: {
           root: ({ ownerState, theme }) => ({
-            '&.Mui-focused': {
+            "&.Mui-focused": {
               backgroundColor: theme.palette.action.selected,
             },
-            '&:hover:not(.Mui-focused)': {
+            "&:hover:not(.Mui-focused)": {
               backgroundColor: theme.palette.action.hover,
             },
           }),
@@ -54,7 +54,7 @@ export function getDisplayTheme(size) {
 
 export function autoScroll(endRef) {
   if (endRef.current) {
-    endRef.current.scrollIntoView({ behavior: 'smooth' });
+    endRef.current.scrollIntoView({ behavior: "smooth" });
   }
 }
 
@@ -66,7 +66,7 @@ export function trimTranscript(oldValues, newValues, maxLines) {
     Object.keys(finalValues).forEach((key) => {
       if (key <= lastLine) {
         console.debug(
-          `Removing line: ${key}, lastLine is ${lastLine}, maxLines is ${maxLines}`
+          `Removing line: ${key}, lastLine is ${lastLine}, maxLines is ${maxLines}`,
         );
         delete finalValues[key];
       }

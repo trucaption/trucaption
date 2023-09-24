@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-} from '@mui/material';
+} from "@mui/material";
 
 export default function SettingsDialog({
   configType,

@@ -4,40 +4,40 @@
     @license GPL-3.0-or-later
 */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 import SpeechRecognition, {
   useSpeechRecognition,
-} from 'react-speech-recognition';
+} from "react-speech-recognition";
 
-import axios from 'axios';
+import axios from "axios";
 
-import BadWordsNext from 'bad-words-next';
-import getUserLocale from 'get-user-locale';
+import BadWordsNext from "bad-words-next";
+import getUserLocale from "get-user-locale";
 
-import BadWordsDictionaries from './BadWordsDictionaries.mjs';
+import BadWordsDictionaries from "./BadWordsDictionaries.mjs";
 
-import AppMenuItem from './Menu/AppMenuItem';
+import AppMenuItem from "./Menu/AppMenuItem";
 
-import AdvancedSettings from './Settings/AdvancedSettings';
-import DisplaySettings from './Settings/DisplaySettings';
-import TranscriptionSettings from './Settings/TranscriptionSettings';
-import TranslationSettings from './Settings/TranslationSettings';
+import AdvancedSettings from "./Settings/AdvancedSettings";
+import DisplaySettings from "./Settings/DisplaySettings";
+import TranscriptionSettings from "./Settings/TranscriptionSettings";
+import TranslationSettings from "./Settings/TranslationSettings";
 
-import locale from 'locale-codes';
+import locale from "locale-codes";
 
-import DownloadIcon from '@mui/icons-material/Download';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import InterpreterModeIcon from '@mui/icons-material/InterpreterMode';
-import LanguageIcon from '@mui/icons-material/Language';
-import MicIcon from '@mui/icons-material/Mic';
-import MicOffIcon from '@mui/icons-material/MicOff';
-import MonitorIcon from '@mui/icons-material/Monitor';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import SettingsIcon from '@mui/icons-material/Settings';
+import DownloadIcon from "@mui/icons-material/Download";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import InterpreterModeIcon from "@mui/icons-material/InterpreterMode";
+import LanguageIcon from "@mui/icons-material/Language";
+import MicIcon from "@mui/icons-material/Mic";
+import MicOffIcon from "@mui/icons-material/MicOff";
+import MonitorIcon from "@mui/icons-material/Monitor";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import SettingsIcon from "@mui/icons-material/Settings";
 
-import fileDownload from 'js-file-download';
+import fileDownload from "js-file-download";
 
 import {
   Box,
@@ -55,20 +55,20 @@ import {
   Slider,
   Toolbar,
   Typography,
-} from '@mui/material';
-import { ThemeProvider } from '@mui/material/styles';
+} from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
 
-import Logo from '../assets/logo.png';
-import Image from 'mui-image';
+import Logo from "../assets/logo.png";
+import Image from "mui-image";
 
 import {
   autoScroll,
   baseTheme,
   getDisplayTheme,
   trimTranscript,
-} from './Common.mjs';
+} from "./Common.mjs";
 
-import { CONFIG_SETTINGS, getDefaultsObject } from '@trucaption/common';
+import { CONFIG_SETTINGS, getDefaultsObject } from "@trucaption/common";
 
 const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
 const drawerWidth = 240;
@@ -88,7 +88,7 @@ export default function Editor() {
   ]);
 
   const [currentLanguage, setCurrentLanguage] = useState(
-    CONFIG_SETTINGS.transcription.defaults.language
+    CONFIG_SETTINGS.transcription.defaults.language,
   );
 
   const [loggedIn, setLoggedIn] = useState(false);
@@ -102,7 +102,7 @@ export default function Editor() {
 
   const [configMenuOpen, setConfigMenuOpen] = useState(false);
 
-  const [tempTranscript, setTempTranscript] = useState('');
+  const [tempTranscript, setTempTranscript] = useState("");
   const [sentLength, setSentLength] = useState(0);
   const [line, setLine] = useState(1);
   const [transcript, setTranscript] = useState(new Object());
@@ -119,7 +119,7 @@ export default function Editor() {
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
-  function sendMessage(message, messageType = 'final') {
+  function sendMessage(message, messageType = "final") {
     try {
       const payload = {
         queue: messageType,
@@ -127,7 +127,7 @@ export default function Editor() {
         language: currentLanguage,
       };
 
-      SERVER_CLIENT.post('/message', payload);
+      SERVER_CLIENT.post("/message", payload);
     } catch (error) {
       console.log(`Error sending message: ${error}`);
     }
@@ -137,7 +137,9 @@ export default function Editor() {
     const lineChange = {};
 
     lineChange[lineNumber] = text;
-    setTranscript((prev) => trimTranscript(prev, lineChange, activeConfig.display.max_lines));
+    setTranscript((prev) =>
+      trimTranscript(prev, lineChange, activeConfig.display.max_lines),
+    );
     if (send) {
       sendMessage(JSON.stringify({ line: lineNumber, text: text }));
       setSentTranscript((prev) => {
@@ -147,7 +149,7 @@ export default function Editor() {
   }
 
   function handleChange(e) {
-    if (typeof e.target.name !== 'undefined') {
+    if (typeof e.target.name !== "undefined") {
       updateTranscript(e.target.name, e.target.value, false);
     }
   }
@@ -164,11 +166,11 @@ export default function Editor() {
 
   function onKeyDown(data) {
     switch (data.key) {
-      case 'Escape':
+      case "Escape":
         data.target.value = sentTranscript[data.target.name];
         document.activeElement.blur();
         break;
-      case 'Enter':
+      case "Enter":
         document.activeElement.blur();
         break;
     }
@@ -184,7 +186,7 @@ export default function Editor() {
 
       updateTranscript(
         line,
-        applyTextEffects(finalTranscript.substring(sentLength))
+        applyTextEffects(finalTranscript.substring(sentLength)),
       );
       setSentLength(finalTranscript.length);
     }
@@ -199,11 +201,11 @@ export default function Editor() {
   }
 
   function downloadTranscript() {
-    fileDownload(Object.values(sentTranscript).join('\n'), 'transcript.txt');
+    fileDownload(Object.values(sentTranscript).join("\n"), "transcript.txt");
   }
 
   function sendTempTranscript() {
-    sendMessage(JSON.stringify({"text": tempTranscript}), 'temp');
+    sendMessage(JSON.stringify({ text: tempTranscript }), "temp");
   }
 
   useEffect(onFinalTranscript, [finalTranscript]);
@@ -233,23 +235,23 @@ export default function Editor() {
     };
 
     console.debug(
-      `Listening via speech API: ${activeConfig.transcription.api}`
+      `Listening via speech API: ${activeConfig.transcription.api}`,
     );
 
-    let targetDict = 'en';
+    let targetDict = "en";
 
     if (
-      activeConfig.transcription.api === 'azure' ||
-      activeConfig.transcription.api === 'speechly'
+      activeConfig.transcription.api === "azure" ||
+      activeConfig.transcription.api === "speechly"
     ) {
       listeningConfig.language = currentLanguage;
-      targetDict = locale.getByTag(currentLanguage)['iso639-1'];
+      targetDict = locale.getByTag(currentLanguage)["iso639-1"];
       console.log(
-        `Starting captions with configured language: ${currentLanguage}`
+        `Starting captions with configured language: ${currentLanguage}`,
       );
     } else {
       const userLocale = getUserLocale();
-      targetDict = locale.getByTag(userLocale)['iso639-1'];
+      targetDict = locale.getByTag(userLocale)["iso639-1"];
       console.log(`Starting captions with browser language: ${userLocale}`);
     }
 
@@ -270,7 +272,7 @@ export default function Editor() {
       updateTranscript(line, applyTextEffects(interimTranscript));
     }
 
-    setTempTranscript('');
+    setTempTranscript("");
   }
 
   function languageChangeAllowed() {
@@ -283,11 +285,11 @@ export default function Editor() {
     resetTranscript();
 
     setTranscript(new Object());
-    setTempTranscript('');
+    setTempTranscript("");
     setSentTranscript(new Object());
     setSentLength(0);
 
-    sendMessage('', 'reset');
+    sendMessage("", "reset");
 
     await login();
     if (wantListen) startListening();
@@ -296,19 +298,19 @@ export default function Editor() {
   async function login() {
     let response;
     try {
-      response = await SERVER_CLIENT.get('/connect');
+      response = await SERVER_CLIENT.get("/connect");
     } catch (error) {
       console.log(error);
-      alert('Login failed.');
+      alert("Login failed.");
       return null;
     }
 
     console.debug(response);
 
     switch (activeConfig.transcription.api) {
-      case 'azure': {
+      case "azure": {
         const { default: createSpeechServicesPonyfill } = await import(
-          'web-speech-cognitive-services'
+          "web-speech-cognitive-services"
         );
         const { SpeechRecognition: AzureSpeechRecognition } =
           createSpeechServicesPonyfill({
@@ -325,33 +327,33 @@ export default function Editor() {
         setAllowedLanguages(filterLanguages(response.data.azureLanguages));
         setCurrentLanguage(activeConfig.transcription.language);
         console.debug(locale.getByTag(activeConfig.transcription.language));
-        console.log('Initialized Azure Speech Services');
+        console.log("Initialized Azure Speech Services");
         break;
       }
 
-      case 'speechly': {
+      case "speechly": {
         const { createSpeechlySpeechRecognition } = await import(
-          '@speechly/speech-recognition-polyfill'
+          "@speechly/speech-recognition-polyfill"
         );
 
         const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
-          response.data.speechly_app
+          response.data.speechly_app,
         );
         setAllowedLanguages([CONFIG_SETTINGS.transcription.defaults.language]);
         setCurrentLanguage(CONFIG_SETTINGS.transcription.defaults.language);
         SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
-        console.log('Initialized Speechly');
+        console.log("Initialized Speechly");
         break;
       }
 
       default:
         SpeechRecognition.removePolyfill();
-        setAllowedLanguages(['']);
-        setCurrentLanguage('');
+        setAllowedLanguages([""]);
+        setCurrentLanguage("");
     }
 
     setLoggedIn(true);
-    sendMessage('', 'reset');
+    sendMessage("", "reset");
   }
 
   function filterLanguages(languages) {
@@ -359,7 +361,7 @@ export default function Editor() {
       const loc = locale.getByTag(item);
 
       if (!loc) return;
-      if (!(loc['iso639-1'] in BadWordsDictionaries)) return;
+      if (!(loc["iso639-1"] in BadWordsDictionaries)) return;
 
       return item;
     });
@@ -376,12 +378,12 @@ export default function Editor() {
   async function getConfig(configType, updateFunction) {
     let response;
     try {
-      response = await SERVER_CLIENT.get('/config', {
+      response = await SERVER_CLIENT.get("/config", {
         params: { config: configType },
       });
     } catch (error) {
       console.log(error);
-      alert('Could not retrieve config.');
+      alert("Could not retrieve config.");
       return null;
     }
 
@@ -412,13 +414,13 @@ export default function Editor() {
   async function postConfig(configType, configObject) {
     console.log(configObject);
     try {
-      await SERVER_CLIENT.post('/config', {
+      await SERVER_CLIENT.post("/config", {
         type: configType,
         config: configObject,
       });
     } catch (error) {
       console.log(error);
-      alert('Could not save config.');
+      alert("Could not save config.");
       return null;
     }
   }
@@ -446,15 +448,15 @@ export default function Editor() {
 
   return (
     <ThemeProvider theme={baseTheme}>
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <Drawer
           sx={{
             width: drawerWidth,
             flexShrink: 0,
-            '& .MuiDrawer-paper': {
+            "& .MuiDrawer-paper": {
               width: drawerWidth,
-              boxSizing: 'border-box',
+              boxSizing: "border-box",
             },
           }}
           variant="permanent"
@@ -480,9 +482,9 @@ export default function Editor() {
                 {listening ? <MicIcon /> : <MicOffIcon />}
               </ListItemIcon>
               <ListItemText
-                primaryTypographyProps={{ color: listening ? 'red' : 'green' }}
+                primaryTypographyProps={{ color: listening ? "red" : "green" }}
               >
-                Microphone {listening ? 'on' : 'off'}
+                Microphone {listening ? "on" : "off"}
               </ListItemText>
             </ListItem>
           </List>
@@ -532,11 +534,11 @@ export default function Editor() {
           </List>
           <Collapse in={configMenuOpen}>
             <List>
-              {loggedIn && activeConfig.transcription.api === 'azure' && (
+              {loggedIn && activeConfig.transcription.api === "azure" && (
                 <ListItem key="language">
                   <ListItemIcon>
                     <LanguageIcon
-                      color={languageChangeAllowed() ? 'inherit' : 'disabled'}
+                      color={languageChangeAllowed() ? "inherit" : "disabled"}
                     />
                   </ListItemIcon>
                   <ListItemText>
@@ -553,12 +555,15 @@ export default function Editor() {
                       {allowedLanguages.map((item) => {
                         const loc = locale.getByTag(item);
                         const allowed =
-                        activeConfig.transcription.allowed_languages.length === 0
+                          activeConfig.transcription.allowed_languages
+                            .length === 0
                             ? true
-                            : activeConfig.transcription.allowed_languages.includes(item);
+                            : activeConfig.transcription.allowed_languages.includes(
+                                item,
+                              );
                         if (
                           loc &&
-                          loc['iso639-1'] in BadWordsDictionaries &&
+                          loc["iso639-1"] in BadWordsDictionaries &&
                           allowed
                         )
                           return (
@@ -586,25 +591,25 @@ export default function Editor() {
               </ListItem>
               <AppMenuItem
                 disabled={wantListen}
-                onClick={() => openConfig('transcription')}
+                onClick={() => openConfig("transcription")}
                 icon={<InterpreterModeIcon />}
                 text="Transcription Engine"
               />
               <AppMenuItem
                 disabled={wantListen}
-                onClick={() => openConfig('translation')}
+                onClick={() => openConfig("translation")}
                 icon={<LanguageIcon />}
                 text="Translation Settings"
               />
               <AppMenuItem
                 disabled={false}
-                onClick={() => openConfig('display')}
+                onClick={() => openConfig("display")}
                 icon={<MonitorIcon />}
                 text="Display Settings"
               />
               <AppMenuItem
                 disabled={wantListen}
-                onClick={() => openConfig('app')}
+                onClick={() => openConfig("app")}
                 icon={<SettingsIcon />}
                 text="Advanced Settings"
               />
@@ -613,7 +618,7 @@ export default function Editor() {
         </Drawer>
         <Box
           component="main"
-          sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
+          sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
         >
           <Toolbar />
           <ThemeProvider theme={getDisplayTheme(size)}>
@@ -650,8 +655,8 @@ export default function Editor() {
           updateConfig={changedConfig}
           loggedIn={loggedIn}
           onChangeFunction={changeConfigValue}
-          onCancel={() => configPanel('transcription', false)}
-          onSave={() => saveConfig('transcription', true)}
+          onCancel={() => configPanel("transcription", false)}
+          onSave={() => saveConfig("transcription", true)}
           currentLanguage={currentLanguage}
           allowedLanguages={allowedLanguages}
         />
@@ -661,8 +666,8 @@ export default function Editor() {
           open={dialogs}
           updateConfig={changedConfig}
           onChangeFunction={changeConfigValue}
-          onCancel={() => configPanel('translation', false)}
-          onSave={() => saveConfig('translation', false)}
+          onCancel={() => configPanel("translation", false)}
+          onSave={() => saveConfig("translation", false)}
         />
 
         <DisplaySettings
@@ -670,8 +675,8 @@ export default function Editor() {
           open={dialogs}
           updateConfig={changedConfig}
           onChangeFunction={changeConfigValue}
-          onCancel={() => configPanel('display', false)}
-          onSave={() => saveConfig('display', false)}
+          onCancel={() => configPanel("display", false)}
+          onSave={() => saveConfig("display", false)}
         />
 
         <AdvancedSettings
@@ -679,8 +684,8 @@ export default function Editor() {
           open={dialogs}
           updateConfig={changedConfig}
           onChangeFunction={changeConfigValue}
-          onCancel={() => configPanel('app', false)}
-          onSave={() => saveConfig('app', true)}
+          onCancel={() => configPanel("app", false)}
+          onSave={() => saveConfig("app", true)}
         />
       </Box>
     </ThemeProvider>

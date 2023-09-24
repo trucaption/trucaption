@@ -4,32 +4,32 @@
     @license GPL-3.0-or-later
 */
 
-import { app, BrowserWindow, shell } from 'electron';
-import log from 'electron-log';
+import { app, BrowserWindow, shell } from "electron";
+import log from "electron-log";
 
-import electronUpdater from 'electron-updater';
+import electronUpdater from "electron-updater";
 
-import express from 'express';
-import expressStaticGzip from 'express-static-gzip';
+import express from "express";
+import expressStaticGzip from "express-static-gzip";
 
-import axios from 'axios';
+import axios from "axios";
 
-import bodyParser from 'body-parser';
+import bodyParser from "body-parser";
 
-import { Server } from 'socket.io';
+import { Server } from "socket.io";
 
-import { CONFIG_SETTINGS } from '@trucaption/common';
+import { CONFIG_SETTINGS } from "@trucaption/common";
 
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-import ip from 'ip';
-import querystring from 'querystring';
+import ip from "ip";
+import querystring from "querystring";
 
-import { createServer } from 'http';
+import { createServer } from "http";
 
-import locale from 'locale-codes';
-import translate from 'translate';
+import locale from "locale-codes";
+import translate from "translate";
 
 const config = {};
 var clientIo = null;
@@ -41,17 +41,17 @@ function createWindow() {
   });
 
   const data = querystring.stringify({
-    editorPort: config['app'].editor_port,
-    viewerPort: config['app'].viewer_port,
+    editorPort: config["app"].editor_port,
+    viewerPort: config["app"].viewer_port,
     version: app.getVersion(),
     viewerIP: ip.address(),
   });
 
-  win.loadURL(`http://localhost:${config['app'].editor_port}/app/?${data}`);
+  win.loadURL(`http://localhost:${config["app"].editor_port}/app/?${data}`);
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
-    return { action: 'deny' };
+    return { action: "deny" };
   });
 
   electronUpdater.autoUpdater.checkForUpdatesAndNotify();
@@ -59,8 +59,8 @@ function createWindow() {
 
 function saveConfigToDisk(configType) {
   const configJson = path.join(
-    app.getPath('userData'),
-    CONFIG_SETTINGS[configType].file
+    app.getPath("userData"),
+    CONFIG_SETTINGS[configType].file,
   );
   fs.writeFileSync(configJson, JSON.stringify(config[configType], null, 2));
 }
@@ -75,8 +75,8 @@ function loadConfig(configType) {
   config[configType] = Object.assign({}, CONFIG_SETTINGS[configType].defaults);
 
   const configJson = path.join(
-    app.getPath('userData'),
-    CONFIG_SETTINGS[configType].file
+    app.getPath("userData"),
+    CONFIG_SETTINGS[configType].file,
   );
 
   if (fs.existsSync(configJson)) {
@@ -91,19 +91,19 @@ function loadConfig(configType) {
 
 export async function runServer(__dirname) {
   // Load configuration objects
-  loadConfig('app');
-  loadConfig('display');
-  loadConfig('transcription');
-  loadConfig('translation');
+  loadConfig("app");
+  loadConfig("display");
+  loadConfig("transcription");
+  loadConfig("translation");
 
   const { AppServer: clientApp, HttpServer: clientHttp } = runWebServer(
-    path.join(__dirname, '../webpack/viewer'),
-    config['app'].viewer_port
+    path.join(__dirname, "../webpack/viewer"),
+    config["app"].viewer_port,
   );
   const { AppServer: controllerApp } = runWebServer(
-    path.join(__dirname, '../webpack/editor'),
-    config['app'].editor_port,
-    true
+    path.join(__dirname, "../webpack/editor"),
+    config["app"].editor_port,
+    true,
   );
 
   // Set up client socket
@@ -113,19 +113,19 @@ export async function runServer(__dirname) {
   controllerApp.use(express.json());
   controllerApp.use(bodyParser.urlencoded({ extended: false }));
 
-  controllerApp.get('/connect', getConnect);
+  controllerApp.get("/connect", getConnect);
 
-  controllerApp.get('/config', getConfig);
-  controllerApp.post('/config', postConfig);
+  controllerApp.get("/config", getConfig);
+  controllerApp.post("/config", postConfig);
 
-  controllerApp.post('/message', postMessage);
+  controllerApp.post("/message", postMessage);
 
   clientIo.of(`/default`);
   setupTranslation();
 
   createWindow();
 
-  app.on('window-all-closed', () => {
+  app.on("window-all-closed", () => {
     app.quit();
   });
 }
@@ -134,17 +134,17 @@ function runWebServer(DIST_DIR, port, localOnly = false) {
   const app = express();
 
   //Serving the files on the dist folder
-  app.use('/', expressStaticGzip(DIST_DIR));
+  app.use("/", expressStaticGzip(DIST_DIR));
 
   //Send index.html when the user access the web
-  app.get('/', function (req, res) {
-    res.sendFile(path.join(DIST_DIR, 'index.html'));
+  app.get("/", function (req, res) {
+    res.sendFile(path.join(DIST_DIR, "index.html"));
   });
 
-  app.get('/defaults', (request, response) => getDefaults(response, config));
+  app.get("/defaults", (request, response) => getDefaults(response, config));
 
   const http = createServer(app);
-  http.listen(port, localOnly ? '127.0.0.1' : '0.0.0.0');
+  http.listen(port, localOnly ? "127.0.0.1" : "0.0.0.0");
 
   log.log(`Serving ${DIST_DIR} on port ${port}`);
 
@@ -154,12 +154,12 @@ function runWebServer(DIST_DIR, port, localOnly = false) {
 function getDefaults(response, config) {
   try {
     response.send({
-      topic: '',
-      font_size: parseInt(config['display'].font_size),
-      max_lines: parseInt(config['display'].max_lines),
+      topic: "",
+      font_size: parseInt(config["display"].font_size),
+      max_lines: parseInt(config["display"].max_lines),
       translation: {
-        enabled: config['translation'].enabled,
-        languages: config['translation'].languages,
+        enabled: config["translation"].enabled,
+        languages: config["translation"].languages,
       },
     });
   } catch (error) {
@@ -172,7 +172,7 @@ function sanitizedConfig(configType) {
   const sanitized_config = Object.assign({}, config[configType]);
 
   CONFIG_SETTINGS[configType].sensitive.forEach((item) => {
-    if (sanitized_config[item]) sanitized_config[item] = 'defined';
+    if (sanitized_config[item]) sanitized_config[item] = "defined";
   });
 
   return sanitized_config;
@@ -182,33 +182,33 @@ async function getConnect(request, response) {
   const responseJson = {};
 
   try {
-    if (config['transcription'].api === 'azure') {
+    if (config["transcription"].api === "azure") {
       const apiResponse = await axios({
-        method: 'post',
-        url: `https://${config['transcription'].azure_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
+        method: "post",
+        url: `https://${config["transcription"].azure_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
         headers: {
-          'Ocp-Apim-Subscription-Key':
-            config['transcription'].azure_subscription_key,
-          'Content-length': 0,
-          'Content-type': 'application/x-www-form-urlencoded',
+          "Ocp-Apim-Subscription-Key":
+            config["transcription"].azure_subscription_key,
+          "Content-length": 0,
+          "Content-type": "application/x-www-form-urlencoded",
         },
       });
 
       const azureLanguagesResponse = await axios({
-        method: 'get',
-        url: `https://${config['transcription'].azure_region}.api.cognitive.microsoft.com/speechtotext/v3.1/evaluations/locales`,
+        method: "get",
+        url: `https://${config["transcription"].azure_region}.api.cognitive.microsoft.com/speechtotext/v3.1/evaluations/locales`,
         headers: {
-          'Ocp-Apim-Subscription-Key':
-            config['transcription'].azure_subscription_key,
+          "Ocp-Apim-Subscription-Key":
+            config["transcription"].azure_subscription_key,
         },
       });
 
-      responseJson['azureToken'] = apiResponse.data;
-      responseJson['azureLanguages'] = azureLanguagesResponse.data;
+      responseJson["azureToken"] = apiResponse.data;
+      responseJson["azureLanguages"] = azureLanguagesResponse.data;
     }
 
-    if (config['transcription'].api === 'speechly') {
-      responseJson['speechly_app'] = config['transcription'].speechly_app;
+    if (config["transcription"].api === "speechly") {
+      responseJson["speechly_app"] = config["transcription"].speechly_app;
     }
 
     response.send(responseJson);
@@ -234,16 +234,16 @@ function postConfig(request, response) {
     const newConfig = Object.assign({}, request.body.config);
 
     CONFIG_SETTINGS[request.body.type].sensitive.forEach((item) => {
-      if (newConfig[item] === 'defined')
+      if (newConfig[item] === "defined")
         newConfig[item] = config[request.body.type][item];
     });
 
-    if (request.body.type === 'display') {
+    if (request.body.type === "display") {
       newConfig.font_size = Number.parseInt(newConfig.font_size);
       newConfig.max_lines = Number.parseInt(newConfig.max_lines);
     }
 
-    if (request.body.type === 'app') {
+    if (request.body.type === "app") {
       newConfig.editor_port = Number.parseInt(newConfig.editor_port);
       newConfig.viewer_port = Number.parseInt(newConfig.viewer_port);
     }
@@ -252,7 +252,7 @@ function postConfig(request, response) {
     saveConfigToDisk(request.body.type);
     response.status(201).end();
 
-    if (request.body.type === 'translation') {
+    if (request.body.type === "translation") {
       setupTranslation();
     }
   } catch (error) {
@@ -263,20 +263,20 @@ function postConfig(request, response) {
 
 function postMessage(request, response) {
   try {
-    clientIo.of('/default').emit(request.body.queue, request.body.data);
+    clientIo.of("/default").emit(request.body.queue, request.body.data);
     response.status(201).end();
 
     if (
       config.translation.enabled &&
-      (request.body.queue === 'final' ||
-        (request.body.queue === 'temp' && config.translation.interim))
+      (request.body.queue === "final" ||
+        (request.body.queue === "temp" && config.translation.interim))
     ) {
       for (const lang of config.translation.languages) {
         translateMessage(
           request.body.language,
           lang,
           request.body.data,
-          request.body.queue
+          request.body.queue,
         );
       }
     }
@@ -293,7 +293,7 @@ function logConnection(request, message) {
 function setupTranslation() {
   if (config.translation.enabled) {
     if (config.translation.key) {
-      log.log('Enabling translation');
+      log.log("Enabling translation");
       translate.engine = config.translation.api;
       translate.key = config.translation.key;
 
@@ -304,12 +304,12 @@ function setupTranslation() {
         }
       }
     } else {
-      log.log('Translation enabled, but key not specified -- disabling.');
+      log.log("Translation enabled, but key not specified -- disabling.");
       config.translation.enabled = false;
-      saveConfigToDisk('translation');
+      saveConfigToDisk("translation");
     }
   } else {
-    log.log('Translation disabled.');
+    log.log("Translation disabled.");
   }
 }
 
@@ -317,13 +317,13 @@ async function translateMessage(
   currentLanguage,
   targetLanguage,
   message,
-  queue
+  queue,
 ) {
   try {
     const current = locale.getByTag(currentLanguage);
     const target = locale.getByTag(targetLanguage);
 
-    if (current['iso639-1'] === target['iso639-1']) {
+    if (current["iso639-1"] === target["iso639-1"]) {
       clientIo.of(`/${targetLanguage}`).emit(queue, JSON.stringify(message));
       return;
     }

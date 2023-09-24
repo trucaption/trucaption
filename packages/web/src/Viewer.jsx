@@ -4,9 +4,9 @@
     @license GPL-3.0-or-later
 */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import MenuIcon from '@mui/icons-material/Menu';
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   Box,
   CssBaseline,
@@ -22,27 +22,27 @@ import {
   Select,
   Slider,
   Typography,
-} from '@mui/material';
-import { ThemeProvider } from '@mui/material/styles';
+} from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
 
-import Logo from '../assets/logo.png';
-import Image from 'mui-image';
+import Logo from "../assets/logo.png";
+import Image from "mui-image";
 
-import LanguageIcon from '@mui/icons-material/Language';
+import LanguageIcon from "@mui/icons-material/Language";
 
-import axios from 'axios';
-import locale from 'locale-codes';
+import axios from "axios";
+import locale from "locale-codes";
 
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
 import {
   autoScroll,
   baseTheme,
   getDisplayTheme,
   trimTranscript,
-} from './Common.mjs';
+} from "./Common.mjs";
 
-import { CONFIG_SETTINGS } from '@trucaption/common';
+import { CONFIG_SETTINGS } from "@trucaption/common";
 
 const SERVER_ADDRESS = `${window.location.protocol}//${window.location.host}`;
 
@@ -51,21 +51,21 @@ const SERVER_CLIENT = axios.create({
 });
 
 export default function Viewer() {
-  const [tempTranscript, setTempTranscript] = useState('Loading...');
+  const [tempTranscript, setTempTranscript] = useState("Loading...");
   const [transcript, setTranscript] = useState(new Object());
   const [size, setSize] = useState(20);
-  const [room, setRoom] = useState('default');
+  const [room, setRoom] = useState("default");
   const [open, setOpen] = useState(false);
   const [maxLines, setMaxLines] = useState(
-    CONFIG_SETTINGS.display.defaults.max_lines
+    CONFIG_SETTINGS.display.defaults.max_lines,
   );
   const [socket, setSocket] = useState(null);
   const [translation, setTranslation] = useState(
-    CONFIG_SETTINGS.translation.defaults
+    CONFIG_SETTINGS.translation.defaults,
   );
 
   const searchParams = new URLSearchParams(document.location.search);
-  const noSidebar = searchParams.has('fullscreen');
+  const noSidebar = searchParams.has("fullscreen");
 
   const drawerWidth = 240;
 
@@ -89,12 +89,12 @@ export default function Viewer() {
 
   function onReset(message) {
     setTranscript(new Object());
-    setTempTranscript('');
+    setTempTranscript("");
   }
 
   function onConnect() {
-    console.log('Connected.');
-    setTempTranscript('');
+    console.log("Connected.");
+    setTempTranscript("");
   }
 
   function toggleSidebar() {
@@ -102,7 +102,7 @@ export default function Viewer() {
   }
 
   async function initializeSocket() {
-    setTempTranscript('');
+    setTempTranscript("");
     setTranscript({});
 
     console.log(`Configuring socket.io for namespace: /${room}`);
@@ -116,43 +116,43 @@ export default function Viewer() {
       autoConnect: false,
     });
 
-    newSocket.on('connect', onConnect);
-    newSocket.on('connect_error', () => console.log('Connection error.'));
+    newSocket.on("connect", onConnect);
+    newSocket.on("connect_error", () => console.log("Connection error."));
 
-    newSocket.on('final', (arg) => onFinal(arg, maxLines));
-    newSocket.on('temp', (arg) => onTemp(arg));
-    newSocket.on('reset', (arg) => onReset(arg));
-    newSocket.on('config', loadConfig());
+    newSocket.on("final", (arg) => onFinal(arg, maxLines));
+    newSocket.on("temp", (arg) => onTemp(arg));
+    newSocket.on("reset", (arg) => onReset(arg));
+    newSocket.on("config", loadConfig());
 
     setSocket(newSocket);
 
     while (!newSocket.connected) {
-      console.log('Attempting connection.');
+      console.log("Attempting connection.");
       newSocket.open();
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   }
 
   async function loadConfig(firstLoad = false) {
-    const response = await SERVER_CLIENT.get('/defaults');
+    const response = await SERVER_CLIENT.get("/defaults");
 
-    console.debug('Received configuration data:');
+    console.debug("Received configuration data:");
     console.debug(response.data);
 
     setMaxLines(response.data.max_lines);
     setTranslation(response.data.translation);
 
     if (firstLoad) {
-      console.debug('First load -- processing searchParams');
+      console.debug("First load -- processing searchParams");
 
-      if (searchParams.has('language')) {
-        setRoom(searchParams.get('language'));
+      if (searchParams.has("language")) {
+        setRoom(searchParams.get("language"));
       }
 
-      if (searchParams.has('size')) {
-        const fixedSize = searchParams.get('size');
+      if (searchParams.has("size")) {
+        const fixedSize = searchParams.get("size");
         if (!isNaN(fixedSize)) {
-          console.log('Setting fixed size');
+          console.log("Setting fixed size");
           setSize(fixedSize);
         }
       } else {
@@ -175,15 +175,15 @@ export default function Viewer() {
 
   return (
     <ThemeProvider theme={baseTheme}>
-      <Box sx={{ display: 'flow' }}>
+      <Box sx={{ display: "flow" }}>
         <CssBaseline />
         {!noSidebar && (
           <>
             <Fab
               onClick={toggleSidebar}
-              style={{ position: 'fixed', top: 16, right: 16 }}
+              style={{ position: "fixed", top: 16, right: 16 }}
               size="medium"
-              sx={{ ...(open && { display: 'none' }) }}
+              sx={{ ...(open && { display: "none" }) }}
             >
               <MenuIcon />
             </Fab>
@@ -191,9 +191,9 @@ export default function Viewer() {
               sx={{
                 width: drawerWidth,
                 flexShrink: 0,
-                '& .MuiDrawer-paper': {
+                "& .MuiDrawer-paper": {
                   width: drawerWidth,
-                  boxSizing: 'border-box',
+                  boxSizing: "border-box",
                 },
               }}
               variant="persistent"

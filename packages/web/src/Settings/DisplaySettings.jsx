@@ -1,6 +1,6 @@
-import { FormControlLabel, Switch, TextField } from '@mui/material';
+import { FormControlLabel, Switch, TextField } from "@mui/material";
 
-import SettingsDialog from './SettingsDialog';
+import SettingsDialog from "./SettingsDialog";
 
 export default function DisplaySettings(props) {
   const { configType, updateConfig, onChangeFunction } = props;
@@ -16,7 +16,7 @@ export default function DisplaySettings(props) {
         value={updateConfig[configType].max_lines}
         required
         onChange={(event) =>
-          onChangeFunction(configType, 'max_lines', event.target.value)
+          onChangeFunction(configType, "max_lines", event.target.value)
         }
       />
       <TextField
@@ -28,7 +28,7 @@ export default function DisplaySettings(props) {
         value={updateConfig[configType].font_size}
         required
         onChange={(event) =>
-          onChangeFunction(configType, 'font_size', event.target.value)
+          onChangeFunction(configType, "font_size", event.target.value)
         }
       />
       <FormControlLabel
@@ -36,7 +36,11 @@ export default function DisplaySettings(props) {
           <Switch
             checked={updateConfig[configType].clear_temp_on_stop}
             onChange={(event) =>
-              onChangeFunction(configType, 'clear_temp_on_stop', event.target.checked)
+              onChangeFunction(
+                configType,
+                "clear_temp_on_stop",
+                event.target.checked,
+              )
             }
           />
         }
@@ -47,7 +51,7 @@ export default function DisplaySettings(props) {
           <Switch
             checked={updateConfig[configType].word_filter}
             onChange={(event) =>
-              onChangeFunction(configType, 'word_filter', event.target.checked)
+              onChangeFunction(configType, "word_filter", event.target.checked)
             }
           />
         }
@@ -58,7 +62,7 @@ export default function DisplaySettings(props) {
           <Switch
             checked={updateConfig[configType].all_caps}
             onChange={(event) =>
-              onChangeFunction(configType, 'all_caps', event.target.checked)
+              onChangeFunction(configType, "all_caps", event.target.checked)
             }
           />
         }

@@ -7,15 +7,15 @@ import {
   Select,
   Stack,
   TextField,
-} from '@mui/material';
+} from "@mui/material";
 
-import { useState } from 'react';
+import { useState } from "react";
 
-import SettingsDialog from './SettingsDialog';
+import SettingsDialog from "./SettingsDialog";
 
-import locale from 'locale-codes';
+import locale from "locale-codes";
 
-import BadWordsDictionaries from '../BadWordsDictionaries.mjs';
+import BadWordsDictionaries from "../BadWordsDictionaries.mjs";
 
 function handleDelete(chipToDelete, allowed_languages) {
   const newArray = allowed_languages.filter((chip) => chip !== chipToDelete);
@@ -36,7 +36,7 @@ export default function TranscriptionSettings(props) {
     loggedIn,
   } = props;
 
-  const [languageSelect, setLanguageSelect] = useState('');
+  const [languageSelect, setLanguageSelect] = useState("");
 
   return (
     <SettingsDialog {...props} title="Transcription Settings">
@@ -45,14 +45,14 @@ export default function TranscriptionSettings(props) {
         label="Transcription Engine"
         fullWidth
         onChange={(event) =>
-          onChangeFunction(configType, 'api', event.target.value)
+          onChangeFunction(configType, "api", event.target.value)
         }
       >
         <MenuItem value="browser">Browser Native</MenuItem>
         <MenuItem value="azure">Azure</MenuItem>
         <MenuItem value="speechly">Speechly</MenuItem>
       </Select>
-      {updateConfig[configType].api === 'azure' && (
+      {updateConfig[configType].api === "azure" && (
         <>
           <TextField
             label="Azure Region"
@@ -62,7 +62,7 @@ export default function TranscriptionSettings(props) {
             value={updateConfig[configType].azure_region}
             required
             onChange={(event) =>
-              onChangeFunction(configType, 'azure_region', event.target.value)
+              onChangeFunction(configType, "azure_region", event.target.value)
             }
           />
           <TextField
@@ -76,8 +76,8 @@ export default function TranscriptionSettings(props) {
             onChange={(event) =>
               onChangeFunction(
                 configType,
-                'azure_subscription_key',
-                event.target.value
+                "azure_subscription_key",
+                event.target.value,
               )
             }
           />
@@ -90,16 +90,16 @@ export default function TranscriptionSettings(props) {
             onChange={(event) =>
               onChangeFunction(
                 configType,
-                'azure_endpoint_id',
-                event.target.value
+                "azure_endpoint_id",
+                event.target.value,
               )
             }
           />
         </>
       )}
       {(loggedIn &&
-        config[configType].api === 'azure' &&
-        updateConfig[configType].api === 'azure' && (
+        config[configType].api === "azure" &&
+        updateConfig[configType].api === "azure" && (
           <>
             <DialogContentText>Allowed languages:</DialogContentText>
             <Stack direction="row" spacing={1}>
@@ -111,11 +111,11 @@ export default function TranscriptionSettings(props) {
                       onDelete={(event) => {
                         onChangeFunction(
                           configType,
-                          'allowed_languages',
+                          "allowed_languages",
                           handleDelete(
                             data,
-                            updateConfig[configType].allowed_languages
-                          )
+                            updateConfig[configType].allowed_languages,
+                          ),
                         );
                       }}
                     />
@@ -135,7 +135,7 @@ export default function TranscriptionSettings(props) {
                 const loc = locale.getByTag(item);
                 if (
                   loc &&
-                  loc['iso639-1'] in BadWordsDictionaries &&
+                  loc["iso639-1"] in BadWordsDictionaries &&
                   !updateConfig[configType].allowed_languages.includes(item)
                 )
                   return (
@@ -150,15 +150,15 @@ export default function TranscriptionSettings(props) {
               onClick={(event) => {
                 if (
                   !updateConfig[configType].allowed_languages.includes(
-                    languageSelect
+                    languageSelect,
                   )
                 ) {
                   onChangeFunction(
                     configType,
-                    'allowed_languages',
+                    "allowed_languages",
                     updateConfig[configType].allowed_languages.concat(
-                      languageSelect
-                    )
+                      languageSelect,
+                    ),
                   );
                 }
               }}
@@ -173,7 +173,7 @@ export default function TranscriptionSettings(props) {
             <Button
               variant="text"
               onClick={(event) =>
-                onChangeFunction(configType, 'language', currentLanguage)
+                onChangeFunction(configType, "language", currentLanguage)
               }
             >
               Set Current Language as Default
@@ -186,7 +186,7 @@ export default function TranscriptionSettings(props) {
           </DialogContentText>
         </>
       )}
-      {updateConfig[configType].api === 'speechly' && (
+      {updateConfig[configType].api === "speechly" && (
         <>
           <TextField
             label="Speechly App"
@@ -197,7 +197,7 @@ export default function TranscriptionSettings(props) {
             required
             value={updateConfig[configType].speechly_app}
             onChange={(event) =>
-              onChangeFunction(configType, 'speechly_app', event.target.value)
+              onChangeFunction(configType, "speechly_app", event.target.value)
             }
           />
         </>

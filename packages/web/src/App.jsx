@@ -4,9 +4,9 @@
     @license GPL-3.0-or-later
 */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import {
   Box,
@@ -18,38 +18,42 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-} from '@mui/material';
-import { ThemeProvider } from '@mui/material/styles';
+} from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
 
-import Logo from '../assets/logo.png';
-import Image from 'mui-image';
+import Logo from "../assets/logo.png";
+import Image from "mui-image";
 
-import versionCheck from '@version-checker/browser';
+import versionCheck from "@version-checker/browser";
 
-import { baseTheme } from './Common.mjs';
+import { baseTheme } from "./Common.mjs";
 
 export default function App() {
   const searchParams = new URLSearchParams(document.location.search);
 
   const queryParams = {
-    editorPort: searchParams.has('editorPort') ? searchParams.get('editorPort') : '',
-    viewerPort: searchParams.has('viewerPort') ? searchParams.get('viewerPort') : '',
-    appVersion: searchParams.has('version') ? searchParams.get('version') : '',
-    viewerIP: searchParams.has('viewerIP') ? searchParams.get('viewerIP') : ''
-  }
+    editorPort: searchParams.has("editorPort")
+      ? searchParams.get("editorPort")
+      : "",
+    viewerPort: searchParams.has("viewerPort")
+      ? searchParams.get("viewerPort")
+      : "",
+    appVersion: searchParams.has("version") ? searchParams.get("version") : "",
+    viewerIP: searchParams.has("viewerIP") ? searchParams.get("viewerIP") : "",
+  };
 
   const urls = {
     editorURL: `http://localhost:${queryParams.editorPort}/`,
     viewerURL: `http://${queryParams.viewerIP}:${queryParams.viewerPort}/`,
-  }
+  };
 
-  const [settings, setSettings] = useState({ ...queryParams, ...urls});
+  const [settings, setSettings] = useState({ ...queryParams, ...urls });
 
-  const [updateState, setUpdateState] = useState('Unknown');
+  const [updateState, setUpdateState] = useState("Unknown");
 
   const versionOptions = {
-    repo: 'trucaption',
-    owner: 'trucaption',
+    repo: "trucaption",
+    owner: "trucaption",
     currentVersion: queryParams.appVersion,
   };
 
@@ -66,25 +70,25 @@ export default function App() {
 
       if (update.update) {
         console.log(`An update is available: ${update.update.name}`);
-        setUpdateState('Available');
+        setUpdateState("Available");
       } else {
-        console.log('Version is current');
-        setUpdateState('Not Available');
+        console.log("Version is current");
+        setUpdateState("Not Available");
       }
     });
-  })
+  });
 
   return (
     <ThemeProvider theme={baseTheme}>
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <Drawer
           sx={{
             width: drawerWidth,
             flexShrink: 0,
-            '& .MuiDrawer-paper': {
+            "& .MuiDrawer-paper": {
               width: drawerWidth,
-              boxSizing: 'border-box',
+              boxSizing: "border-box",
             },
           }}
           variant="permanent"
@@ -97,7 +101,11 @@ export default function App() {
           </List>
           <List>
             <ListItem disablePadding>
-              <ListItemButton component="a" href={settings.editorURL} target="_blank">
+              <ListItemButton
+                component="a"
+                href={settings.editorURL}
+                target="_blank"
+              >
                 <ListItemIcon>
                   <OpenInNewIcon />
                 </ListItemIcon>
@@ -105,7 +113,11 @@ export default function App() {
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton component="a" href={settings.viewerURL} target="_blank">
+              <ListItemButton
+                component="a"
+                href={settings.viewerURL}
+                target="_blank"
+              >
                 <ListItemIcon>
                   <OpenInNewIcon />
                 </ListItemIcon>
@@ -122,7 +134,7 @@ export default function App() {
               <ListItemText>Viewer Port: {settings.viewerPort}</ListItemText>
             </ListItem>
           </List>
-          <List style={{ marginTop: 'auto' }} >
+          <List style={{ marginTop: "auto" }}>
             <ListItem>
               <ListItemText>Version: {settings.appVersion}</ListItemText>
             </ListItem>
