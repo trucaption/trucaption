@@ -4,8 +4,8 @@
     @license GPL-3.0-or-later
 */
 
-import CmgSansWoff2 from "../assets/CMGSans-Regular.woff2";
 import { createTheme } from "@mui/material/styles/index.js";
+import CmgSansWoff2 from "../assets/CMGSans-Regular.woff2";
 
 export const baseTheme = createTheme({
   palette: {

@@ -4,8 +4,8 @@
     @license GPL-3.0-or-later
 */
 
-import Viewer from "./Viewer.jsx";
 import { createRoot } from "react-dom/client";
+import Viewer from "./Viewer.jsx";
 
 const container = document.getElementById("root");
 const root = createRoot(container);

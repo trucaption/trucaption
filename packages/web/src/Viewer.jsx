@@ -25,8 +25,8 @@ import {
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 
-import Logo from "../assets/logo.png";
 import Image from "mui-image";
+import Logo from "../assets/logo.png";
 
 import LanguageIcon from "@mui/icons-material/Language";
 

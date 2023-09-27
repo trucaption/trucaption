@@ -4,8 +4,8 @@
     @license GPL-3.0-or-later
 */
 
-import Editor from "./Editor.jsx";
 import { createRoot } from "react-dom/client";
+import Editor from "./Editor.jsx";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
