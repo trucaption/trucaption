@@ -27,6 +27,7 @@ import ip from "ip";
 import querystring from "querystring";
 
 import { createServer } from "http";
+import RateLimit from 'express-rate-limit'
 
 import locale from "locale-codes";
 import translate from "translate";
@@ -133,11 +134,16 @@ export async function runServer(__dirname) {
 function runWebServer(DIST_DIR, port, localOnly = false) {
   const app = express();
 
+  const limiter = RateLimit({
+    windowMs: 60 * 1000,
+    max: 100,
+  });
+
   //Serving the files on the dist folder
-  app.use("/", expressStaticGzip(DIST_DIR));
+  app.use("/", limiter, expressStaticGzip(DIST_DIR));
 
   //Send index.html when the user access the web
-  app.get("/", function (req, res) {
+  app.get("/", limiter, function (req, res) {
     res.sendFile(path.join(DIST_DIR, "index.html"));
   });
 
