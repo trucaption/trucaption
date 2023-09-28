@@ -239,26 +239,32 @@ function postConfig(request, response) {
     logConnection(request, `Received config POST for ${request.body.type}`);
     const newConfig = Object.assign({}, request.body.config);
 
-    CONFIG_SETTINGS[request.body.type].sensitive.forEach((item) => {
+    let id = request.body.type;
+    if (id === '__proto__' || id === 'constructor' || id === 'prototype') {
+        response.end(403);
+        return;
+    }
+
+    CONFIG_SETTINGS[id].sensitive.forEach((item) => {
       if (newConfig[item] === "defined")
-        newConfig[item] = config[request.body.type][item];
+        newConfig[item] = config[id][item];
     });
 
-    if (request.body.type === "display") {
+    if (id === "display") {
       newConfig.font_size = Number.parseInt(newConfig.font_size);
       newConfig.max_lines = Number.parseInt(newConfig.max_lines);
     }
 
-    if (request.body.type === "app") {
+    if (id === "app") {
       newConfig.editor_port = Number.parseInt(newConfig.editor_port);
       newConfig.viewer_port = Number.parseInt(newConfig.viewer_port);
     }
 
-    Object.assign(config[request.body.type], newConfig);
-    saveConfigToDisk(request.body.type);
+    Object.assign(config[id], newConfig);
+    saveConfigToDisk(id);
     response.status(201).end();
 
-    if (request.body.type === "translation") {
+    if (id === "translation") {
       setupTranslation();
     }
   } catch (error) {
