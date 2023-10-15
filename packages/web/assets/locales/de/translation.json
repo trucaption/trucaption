@@ -1,0 +1,73 @@
+{
+  "app": {
+    "editorPort": "Editor Port",
+    "openEditor": "Open Editor",
+    "openViewer": "Open Viewer",
+    "update": "Update",
+    "updateAvailable": "Available",
+    "updateNotAvailable": "Not Available",
+    "version": "Version",
+    "viewerPort": "Viewer Port"
+  },
+  "common": {
+    "close": "Close",
+    "default": "Default",
+    "fontSize": "Font Size"
+  },
+  "dialog": {
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "editor": {
+    "advancedSettings": "Advanced",
+    "connect": "Connect",
+    "displaySettings": "Display",
+    "download": "Download",
+    "listeningOff": "Microphone Off",
+    "listeningOn": "Microphone On",
+    "resetCaptions": "Reset Captions",
+    "settings": {
+      "addLanguage": "Add Language",
+      "advanced": {
+        "editorPort": "Editor Port",
+        "message": "Note: Port changes require a restart to take effect.",
+        "ports": "Ports",
+        "viewerPort": "Viewer Port"
+      },
+      "display": {
+        "allCaps": "Display text in all caps",
+        "clearTemp": "Clear interim transcript on stop",
+        "defaultFontSize": "Default Font Size",
+        "maxLines": "Maximum Lines",
+        "wordFilter": "Use word filter"
+      },
+      "engine": "Engine",
+      "language": "Language",
+      "menu": "Settings",
+      "transcription": {
+        "allowedLanguages": "Allowed Languages",
+        "azureEndpoint": "Azure Endpoint ID",
+        "azureKey": "Azure Subscription Key",
+        "azureRegion": "Azure Region",
+        "browser": "Browser",
+        "defaultLanguage": "Default Language",
+        "languageAzureConnected": "Language settings are only available when Azure is connected.",
+        "setCurrentDefault": "Set Current Language as Default",
+        "speechlyApp": "Speechly App"
+      },
+      "translation": {
+        "apiKey": "API Key",
+        "enabled": "Translation Enabled",
+        "interim": "Translate interim transcripts",
+        "languages": "Languages"
+      }
+    },
+    "startCaptions": "Start Captions",
+    "stopCaptions": "Stop Captions",
+    "transcriptionSettings": "Transcription",
+    "translationSettings": "Translation"
+  },
+  "viewer": {
+    "loading": "Loading..."
+  }
+}

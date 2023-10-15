@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 
+import LanguageIcon from "@mui/icons-material/Language";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import {
@@ -18,6 +19,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  MenuItem,
+  Select,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 
@@ -26,9 +29,13 @@ import Logo from "../assets/logo.png";
 
 import versionCheck from "@version-checker/browser";
 
+import { useTranslation } from "react-i18next";
+
 import { baseTheme } from "./Common.mjs";
 
 export default function App() {
+  const { t, i18n } = useTranslation();
+
   const searchParams = new URLSearchParams(document.location.search);
 
   const queryParams = {
@@ -48,6 +55,7 @@ export default function App() {
   };
 
   const [settings, setSettings] = useState({ ...queryParams, ...urls });
+  const [language, setLanguage] = useState("en");
 
   const [updateState, setUpdateState] = useState("Unknown");
 
@@ -70,13 +78,25 @@ export default function App() {
 
       if (update.update) {
         console.log(`An update is available: ${update.update.name}`);
-        setUpdateState("Available");
+        setUpdateState(t("app.updateAvailable"));
       } else {
         console.log("Version is current");
-        setUpdateState("Not Available");
+        setUpdateState(t("app.updateNotAvailable"));
       }
     });
   });
+
+  useEffect(() => {
+    i18n.changeLanguage(language);
+
+    const newUrls = {
+      editorURL: `http://localhost:${queryParams.editorPort}/?language=${language}`,
+      viewerURL: `http://${queryParams.viewerIP}:${queryParams.viewerPort}/?language=${language}`,
+    };
+    setSettings((prev) => {
+      return { ...prev, ...newUrls };
+    });
+  }, [language]);
 
   return (
     <ThemeProvider theme={baseTheme}>
@@ -109,7 +129,7 @@ export default function App() {
                 <ListItemIcon>
                   <OpenInNewIcon />
                 </ListItemIcon>
-                <ListItemText>Open Editor</ListItemText>
+                <ListItemText>{t("app.openEditor")}</ListItemText>
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
@@ -121,25 +141,62 @@ export default function App() {
                 <ListItemIcon>
                   <OpenInNewIcon />
                 </ListItemIcon>
-                <ListItemText>Open Viewer</ListItemText>
+                <ListItemText>{t("app.openViewer")}</ListItemText>
               </ListItemButton>
             </ListItem>
           </List>
           <Divider />
           <List>
+            <ListItem key="language">
+              <ListItemIcon>
+                <LanguageIcon />
+              </ListItemIcon>
+              <ListItemText>
+                <Select
+                  value={language}
+                  label="Language"
+                  variant="standard"
+                  onChange={(e) => {
+                    setLanguage(e.target.value);
+                  }}
+                  fullWidth
+                >
+                  <MenuItem value="en" key="en">
+                    English
+                  </MenuItem>
+                  <MenuItem value="es" key="es">
+                    Espanol
+                  </MenuItem>
+                  <MenuItem value="fr" key="fr">
+                    Francais
+                  </MenuItem>
+                </Select>
+              </ListItemText>
+            </ListItem>
+          </List>
+          <Divider />
+          <List>
             <ListItem>
-              <ListItemText>Editor Port: {settings.editorPort}</ListItemText>
+              <ListItemText>
+                {t("app.editorPort")}: {settings.editorPort}
+              </ListItemText>
             </ListItem>
             <ListItem>
-              <ListItemText>Viewer Port: {settings.viewerPort}</ListItemText>
+              <ListItemText>
+                {t("app.viewerPort")}: {settings.viewerPort}
+              </ListItemText>
             </ListItem>
           </List>
           <List style={{ marginTop: "auto" }}>
             <ListItem>
-              <ListItemText>Version: {settings.appVersion}</ListItemText>
+              <ListItemText>
+                {t("app.version")}: {settings.appVersion}
+              </ListItemText>
             </ListItem>
             <ListItem>
-              <ListItemText>Update: {updateState}</ListItemText>
+              <ListItemText>
+                {t("app.update")}: {updateState}
+              </ListItemText>
             </ListItem>
           </List>
         </Drawer>

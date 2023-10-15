@@ -1,0 +1,73 @@
+{
+  "app": {
+    "editorPort": "Puerto del editor",
+    "openEditor": "Abra el Editor",
+    "openViewer": "Abra el Visor",
+    "update": "Actualización",
+    "updateAvailable": "Hay disponible",
+    "updateNotAvailable": "No hay disponible",
+    "version": "Versión",
+    "viewerPort": "Puerto de visor"
+  },
+  "common": {
+    "close": "Cierra",
+    "default": "Por defecto",
+    "fontSize": "Tamaño de fuente"
+  },
+  "dialog": {
+    "cancel": "Cancela",
+    "save": "Archiva"
+  },
+  "editor": {
+    "advancedSettings": "Opciones avanzadas",
+    "connect": "Conecta",
+    "displaySettings": "Visualización",
+    "download": "Descarga",
+    "listeningOff": "Micrófono desactivado",
+    "listeningOn": "Micrófono activado",
+    "resetCaptions": "Borra leyendas",
+    "settings": {
+      "addLanguage": "Añadir Idioma",
+      "advanced": {
+        "editorPort": "Puerto del editor",
+        "message": "Nota: Los cambios en los puertos requieren un reinicio para tener efecto.",
+        "ports": "Puertos",
+        "viewerPort": "Puerto de visor"
+      },
+      "display": {
+        "allCaps": "Muestra texto en todos los topes",
+        "clearTemp": "Borra transcripción provisional al detenerse",
+        "defaultFontSize": "Tamaño por defecto",
+        "maxLines": "Líneas máximas",
+        "wordFilter": "Usa filtro de palabras"
+      },
+      "engine": "Servicio",
+      "language": "Idioma",
+      "menu": "Configuración",
+      "transcription": {
+        "allowedLanguages": "Idiomas permitidos",
+        "azureEndpoint": "Punto de conexión Azure",
+        "azureKey": "Clave de suscripción Azure",
+        "azureRegion": "Región de Azure",
+        "browser": "Navegador",
+        "defaultLanguage": "Idioma por Defecto",
+        "languageAzureConnected": "Los ajustes de idioma solo están disponibles cuando Azure está conectado.",
+        "setCurrentDefault": "Establece el idioma actual por defecto",
+        "speechlyApp": "App de Speechly"
+      },
+      "translation": {
+        "apiKey": "Llave de API",
+        "enabled": "Traducciones habilitadas",
+        "interim": "Traduce transcripciones provisionales",
+        "languages": "Idiomas"
+      }
+    },
+    "startCaptions": "Inicia leyendas",
+    "stopCaptions": "Para leyendas",
+    "transcriptionSettings": "Transcripción",
+    "translationSettings": "Traducción"
+  },
+  "viewer": {
+    "loading": "Cargando..."
+  }
+}

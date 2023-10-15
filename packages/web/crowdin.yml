@@ -1,0 +1,5 @@
+project_id: '619244'
+api_token_env: CROWDIN_PERSONAL_TOKEN
+files:
+  - source: /assets/locales/en/**/*
+    translation: /assets/locales/%two_letters_code%/**/%original_file_name%

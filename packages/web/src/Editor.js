@@ -7,6 +7,8 @@
 import { createRoot } from "react-dom/client";
 import Editor from "./Editor.jsx";
 
+import "./i18n";
+
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(<Editor />);

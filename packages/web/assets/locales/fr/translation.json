@@ -1,0 +1,73 @@
+{
+  "app": {
+    "editorPort": "Port de l'éditeur",
+    "openEditor": "Ouvrir l'éditeur",
+    "openViewer": "Ouvrir la visionneuse",
+    "update": "Mise à jour",
+    "updateAvailable": "Disponible",
+    "updateNotAvailable": "Indisponible",
+    "version": "Version",
+    "viewerPort": "Port de visionneuse"
+  },
+  "common": {
+    "close": "Fermer",
+    "default": "Par défaut",
+    "fontSize": "Taille de police"
+  },
+  "dialog": {
+    "cancel": "Annuler",
+    "save": "Enregistrer"
+  },
+  "editor": {
+    "advancedSettings": "Paramètres avancés",
+    "connect": "Connecter",
+    "displaySettings": "Affichage",
+    "download": "Télécharger",
+    "listeningOff": "Microphone désactivé",
+    "listeningOn": "Microphone activé",
+    "resetCaptions": "Réinitialiser les légendes",
+    "settings": {
+      "addLanguage": "Ajouter une langue",
+      "advanced": {
+        "editorPort": "Port de l'éditeur",
+        "message": "Remarque : les changements de port nécessitent un redémarrage pour prendre effet.",
+        "ports": "Ports",
+        "viewerPort": "Port de visionneuse"
+      },
+      "display": {
+        "allCaps": "Afficher le texte en majuscules",
+        "clearTemp": "Effacer la transcription intermédiaire en cas d'arrêt",
+        "defaultFontSize": "Taille de police par défaut",
+        "maxLines": "Nombre maximal de lignes",
+        "wordFilter": "Utiliser le filtre de mots"
+      },
+      "engine": "Moteur",
+      "language": "Langue",
+      "menu": "Paramètres",
+      "transcription": {
+        "allowedLanguages": "Langues autorisées",
+        "azureEndpoint": "ID de point de terminaison Azure",
+        "azureKey": "Clé d'abonnement Azure",
+        "azureRegion": "Région Azure",
+        "browser": "Navigateur",
+        "defaultLanguage": "Langue par défaut",
+        "languageAzureConnected": "Les paramètres de langue ne sont disponibles que lorsque Azure est connecté.",
+        "setCurrentDefault": "Définir la langue actuelle comme langue par défaut",
+        "speechlyApp": "Application vocale"
+      },
+      "translation": {
+        "apiKey": "Clé d'API",
+        "enabled": "Traduction activée",
+        "interim": "Traduire les transcriptions intermédiaires",
+        "languages": "Langues"
+      }
+    },
+    "startCaptions": "Démarrer les légendes",
+    "stopCaptions": "Arrêter les légendes",
+    "transcriptionSettings": "Transcription",
+    "translationSettings": "Traduction"
+  },
+  "viewer": {
+    "loading": "Chargement..."
+  }
+}

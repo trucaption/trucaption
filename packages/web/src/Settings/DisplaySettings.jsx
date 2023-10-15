@@ -1,14 +1,17 @@
 import { FormControlLabel, Switch, TextField } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import SettingsDialog from "./SettingsDialog";
 
 export default function DisplaySettings(props) {
   const { configType, updateConfig, onChangeFunction } = props;
+  const { t } = useTranslation();
 
   return (
-    <SettingsDialog {...props} title="Display Settings">
+    <SettingsDialog {...props} title={t("editor.displaySettings")}>
       <TextField
-        label="Maximum Lines"
+        label={t("editor.settings.display.maxLines")}
         margin="normal"
         variant="standard"
         fullWidth
@@ -20,7 +23,7 @@ export default function DisplaySettings(props) {
         }
       />
       <TextField
-        label="Default Font Size"
+        label={t("editor.settings.display.defaultFontSize")}
         margin="normal"
         variant="standard"
         fullWidth
@@ -44,7 +47,7 @@ export default function DisplaySettings(props) {
             }
           />
         }
-        label="Clear temporary transcript on stop"
+        label={t("editor.settings.display.clearTemp")}
       />
       <FormControlLabel
         control={
@@ -55,7 +58,7 @@ export default function DisplaySettings(props) {
             }
           />
         }
-        label="Use word filter"
+        label={t("editor.settings.display.wordFilter")}
       />
       <FormControlLabel
         control={
@@ -66,7 +69,7 @@ export default function DisplaySettings(props) {
             }
           />
         }
-        label="Display text in all caps"
+        label={t("editor.settings.display.allCaps")}
       />
     </SettingsDialog>
   );

@@ -13,6 +13,8 @@ import {
 
 import { useState } from "react";
 
+import { useTranslation } from "react-i18next";
+
 import SettingsDialog from "./SettingsDialog";
 
 import locale from "locale-codes";
@@ -27,12 +29,13 @@ function handleDelete(chipToDelete, allowed_languages) {
 
 export default function TranslationSettings(props) {
   const { configType, updateConfig, onChangeFunction } = props;
+  const { t } = useTranslation();
 
   const [languageSelect, setLanguageSelect] = useState("");
   const allowedLanguages = GoogleLanguages;
 
   return (
-    <SettingsDialog {...props} title="Translation Settings">
+    <SettingsDialog {...props} title={t("editor.translationSettings")}>
       <FormControlLabel
         control={
           <Switch
@@ -42,13 +45,13 @@ export default function TranslationSettings(props) {
             }
           />
         }
-        label="Enable Translation"
+        label={t("editor.settings.translation.enabled")}
       />
       {updateConfig[configType].enabled && (
         <>
           <Select
             value={updateConfig[configType].api}
-            label="Translation Engine"
+            label={t("editor.settings.engine")}
             fullWidth
             onChange={(event) =>
               onChangeFunction(configType, "api", event.target.value)
@@ -57,7 +60,7 @@ export default function TranslationSettings(props) {
             <MenuItem value="google">Google</MenuItem>
           </Select>
           <TextField
-            label="API Key"
+            label={t("editor.settings.translation.apiKey")}
             type="password"
             margin="normal"
             variant="standard"
@@ -77,9 +80,11 @@ export default function TranslationSettings(props) {
                 }
               />
             }
-            label="Translate interim transcripts"
+            label={t("editor.settings.translation.interim")}
           />
-          <DialogContentText>Languages:</DialogContentText>
+          <DialogContentText>
+            {t("editor.settings.translation.languages")}:
+          </DialogContentText>
           <Stack direction="row" spacing={1}>
             {updateConfig[configType].languages.map((data) => {
               return (
@@ -100,7 +105,7 @@ export default function TranslationSettings(props) {
           </Stack>
           <Select
             value={languageSelect}
-            label="Language"
+            label={t("editor.settings.language")}
             variant="standard"
             onChange={(e) => {
               setLanguageSelect(e.target.value);
@@ -130,7 +135,7 @@ export default function TranslationSettings(props) {
               }
             }}
           >
-            Add Language
+            {t("editor.settings.addLanguage")}
           </Button>
         </>
       )}

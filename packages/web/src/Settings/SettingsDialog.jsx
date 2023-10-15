@@ -7,6 +7,8 @@ import {
   FormControl,
 } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 export default function SettingsDialog({
   configType,
   open,
@@ -15,6 +17,8 @@ export default function SettingsDialog({
   children,
   title,
 }) {
+  const { t } = useTranslation();
+
   return (
     <Dialog scroll="paper" open={open[configType]} onClose={null}>
       <DialogTitle>{title}</DialogTitle>
@@ -24,8 +28,8 @@ export default function SettingsDialog({
         </FormControl>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button onClick={onSave}>Save</Button>
+        <Button onClick={onCancel}>{t("dialog.cancel")}</Button>
+        <Button onClick={onSave}>{t("dialog.save")}</Button>
       </DialogActions>
     </Dialog>
   );

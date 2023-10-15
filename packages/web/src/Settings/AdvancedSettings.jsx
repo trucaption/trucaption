@@ -1,14 +1,20 @@
 import { DialogContentText, TextField } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import SettingsDialog from "./SettingsDialog";
 
 export default function AdvancedSettings(props) {
   const { configType, updateConfig, onChangeFunction } = props;
+  const { t } = useTranslation();
+
   return (
-    <SettingsDialog {...props} title="Advanced Settings">
-      <DialogContentText sx={{ fontWeight: "bold" }}>Ports</DialogContentText>
+    <SettingsDialog {...props} title={t("editor.advancedSettings")}>
+      <DialogContentText sx={{ fontWeight: "bold" }}>
+        {t("editor.settings.advanced.ports")}
+      </DialogContentText>
       <TextField
-        label="Editor Port"
+        label={t("editor.settings.advanced.editorPort")}
         margin="normal"
         variant="standard"
         fullWidth
@@ -20,7 +26,7 @@ export default function AdvancedSettings(props) {
         }
       />
       <TextField
-        label="Viewer Port"
+        label={t("editor.settings.advanced.viewerPort")}
         margin="normal"
         variant="standard"
         fullWidth
@@ -32,7 +38,7 @@ export default function AdvancedSettings(props) {
         }
       />
       <DialogContentText>
-        Note: Port changes require a restart to take effect.
+        {t("editor.settings.advanced.message")}
       </DialogContentText>
     </SettingsDialog>
   );

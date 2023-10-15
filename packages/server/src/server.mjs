@@ -27,7 +27,7 @@ import ip from "ip";
 import querystring from "querystring";
 
 import { createServer } from "http";
-import RateLimit from 'express-rate-limit'
+import RateLimit from "express-rate-limit";
 
 import locale from "locale-codes";
 import translate from "translate";
@@ -240,14 +240,13 @@ function postConfig(request, response) {
     const newConfig = Object.assign({}, request.body.config);
 
     let id = request.body.type;
-    if (id === '__proto__' || id === 'constructor' || id === 'prototype') {
-        response.end(403);
-        return;
+    if (id === "__proto__" || id === "constructor" || id === "prototype") {
+      response.end(403);
+      return;
     }
 
     CONFIG_SETTINGS[id].sensitive.forEach((item) => {
-      if (newConfig[item] === "defined")
-        newConfig[item] = config[id][item];
+      if (newConfig[item] === "defined") newConfig[item] = config[id][item];
     });
 
     if (id === "display") {

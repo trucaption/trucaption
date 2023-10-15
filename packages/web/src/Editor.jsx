@@ -61,6 +61,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import Image from "mui-image";
 import Logo from "../assets/logo.png";
 
+import { useTranslation } from "react-i18next";
+
 import {
   autoScroll,
   baseTheme,
@@ -78,6 +80,8 @@ const SERVER_CLIENT = axios.create({
 });
 
 export default function Editor() {
+  const { t, i18n } = useTranslation();
+
   const [size, setSize] = useState(20);
 
   const [activeConfig, setActiveConfig] = useState(getDefaultsObject());
@@ -373,6 +377,10 @@ export default function Editor() {
     });
 
     console.debug(`Detected locale: ${getUserLocale()}`);
+
+    if (searchParams.has("language")) {
+      i18n.changeLanguage(searchParams.get("language"));
+    }
   }
 
   async function getConfig(configType, updateFunction) {
@@ -472,7 +480,7 @@ export default function Editor() {
               disabled={loggedIn}
               onClick={login}
               icon={<InboxIcon />}
-              text="Connect"
+              text={t("editor.connect")}
             />
           </List>
           <Divider />
@@ -484,7 +492,7 @@ export default function Editor() {
               <ListItemText
                 primaryTypographyProps={{ color: listening ? "red" : "green" }}
               >
-                Microphone {listening ? "on" : "off"}
+                {listening ? t("editor.listeningOn") : t("editor.listeningOff")}
               </ListItemText>
             </ListItem>
           </List>
@@ -496,13 +504,13 @@ export default function Editor() {
               }
               onClick={startListening}
               icon={<MicIcon />}
-              text="Start Captions"
+              text={t("editor.startCaptions")}
             />
             <AppMenuItem
               disabled={!loggedIn || !listening}
               onClick={stopListening}
               icon={<MicOffIcon />}
-              text="Stop Captions"
+              text={t("editor.stopCaptions")}
             />
           </List>
           <Divider />
@@ -511,7 +519,7 @@ export default function Editor() {
               disabled={!loggedIn}
               onClick={resetScreen}
               icon={<MicIcon />}
-              text="Reset Captions"
+              text={t("editor.resetCaptions")}
             />
           </List>
           <Divider />
@@ -520,7 +528,7 @@ export default function Editor() {
               disabled={!loggedIn || !browserSupportsSpeechRecognition}
               onClick={downloadTranscript}
               icon={<DownloadIcon />}
-              text="Download"
+              text={t("editor.download")}
             />
           </List>
           <Divider />
@@ -529,7 +537,7 @@ export default function Editor() {
               disabled={false}
               onClick={() => setConfigMenuOpen(!configMenuOpen)}
               icon={configMenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              text="Settings"
+              text={t("editor.settings.menu")}
             />
           </List>
           <Collapse in={configMenuOpen}>
@@ -577,7 +585,9 @@ export default function Editor() {
                 </ListItem>
               )}
               <ListItem>
-                <ListItemText>Font Size: ({size})</ListItemText>
+                <ListItemText>
+                  {t("common.fontSize")}: ({size})
+                </ListItemText>
               </ListItem>
               <ListItem>
                 <Slider
@@ -593,25 +603,25 @@ export default function Editor() {
                 disabled={wantListen}
                 onClick={() => openConfig("transcription")}
                 icon={<InterpreterModeIcon />}
-                text="Transcription Engine"
+                text={t("editor.transcriptionSettings")}
               />
               <AppMenuItem
                 disabled={wantListen}
                 onClick={() => openConfig("translation")}
                 icon={<LanguageIcon />}
-                text="Translation Settings"
+                text={t("editor.translationSettings")}
               />
               <AppMenuItem
                 disabled={false}
                 onClick={() => openConfig("display")}
                 icon={<MonitorIcon />}
-                text="Display Settings"
+                text={t("editor.displaySettings")}
               />
               <AppMenuItem
                 disabled={wantListen}
                 onClick={() => openConfig("app")}
                 icon={<SettingsIcon />}
-                text="Advanced Settings"
+                text={t("editor.advancedSettings")}
               />
             </List>
           </Collapse>

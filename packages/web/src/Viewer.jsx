@@ -35,6 +35,8 @@ import locale from "locale-codes";
 
 import { io } from "socket.io-client";
 
+import { useTranslation } from "react-i18next";
+
 import {
   autoScroll,
   baseTheme,
@@ -51,7 +53,9 @@ const SERVER_CLIENT = axios.create({
 });
 
 export default function Viewer() {
-  const [tempTranscript, setTempTranscript] = useState("Loading...");
+  const { t, i18n } = useTranslation();
+
+  const [tempTranscript, setTempTranscript] = useState(t("viewer.loading"));
   const [transcript, setTranscript] = useState(new Object());
   const [size, setSize] = useState(20);
   const [room, setRoom] = useState("default");
@@ -222,7 +226,7 @@ export default function Viewer() {
                         fullWidth
                       >
                         <MenuItem value="default" key="default">
-                          Default
+                          {t("common.default")}
                         </MenuItem>
                         {translation.languages.map((item) => {
                           const loc = locale.getByTag(item);
@@ -239,7 +243,9 @@ export default function Viewer() {
               )}
               <List>
                 <ListItem disablePadding>
-                  <ListItemText>Font Size: ({size})</ListItemText>
+                  <ListItemText>
+                    {t("common.fontSize")}: ({size})
+                  </ListItemText>
                 </ListItem>
                 <ListItem>
                   <Slider
@@ -258,7 +264,7 @@ export default function Viewer() {
                     <ListItemIcon>
                       <MenuIcon />
                     </ListItemIcon>
-                    <ListItemText>Close</ListItemText>
+                    <ListItemText>{t("common.close")}</ListItemText>
                   </ListItemButton>
                 </ListItem>
               </List>

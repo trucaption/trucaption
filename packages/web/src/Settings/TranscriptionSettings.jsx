@@ -15,6 +15,8 @@ import SettingsDialog from "./SettingsDialog";
 
 import locale from "locale-codes";
 
+import { useTranslation } from "react-i18next";
+
 import BadWordsDictionaries from "../BadWordsDictionaries.mjs";
 
 function handleDelete(chipToDelete, allowed_languages) {
@@ -37,25 +39,28 @@ export default function TranscriptionSettings(props) {
   } = props;
 
   const [languageSelect, setLanguageSelect] = useState("");
+  const { t } = useTranslation();
 
   return (
-    <SettingsDialog {...props} title="Transcription Settings">
+    <SettingsDialog {...props} title={t("editor.transcriptionSettings")}>
       <Select
         value={updateConfig[configType].api}
-        label="Transcription Engine"
+        label={t("editor.settings.engine")}
         fullWidth
         onChange={(event) =>
           onChangeFunction(configType, "api", event.target.value)
         }
       >
-        <MenuItem value="browser">Browser Native</MenuItem>
+        <MenuItem value="browser">
+          {t("editor.settings.transcription.browser")}
+        </MenuItem>
         <MenuItem value="azure">Azure</MenuItem>
         <MenuItem value="speechly">Speechly</MenuItem>
       </Select>
       {updateConfig[configType].api === "azure" && (
         <>
           <TextField
-            label="Azure Region"
+            label={t("editor.settings.transcription.azureRegion")}
             margin="normal"
             variant="standard"
             fullWidth
@@ -66,7 +71,7 @@ export default function TranscriptionSettings(props) {
             }
           />
           <TextField
-            label="Azure Subscription Key"
+            label={t("editor.settings.transcription.azureKey")}
             type="password"
             margin="normal"
             variant="standard"
@@ -82,7 +87,7 @@ export default function TranscriptionSettings(props) {
             }
           />
           <TextField
-            label="Azure Endpoint ID"
+            label={t("editor.settings.transcription.azureEndpoint")}
             margin="normal"
             variant="standard"
             fullWidth
@@ -101,7 +106,9 @@ export default function TranscriptionSettings(props) {
         config[configType].api === "azure" &&
         updateConfig[configType].api === "azure" && (
           <>
-            <DialogContentText>Allowed languages:</DialogContentText>
+            <DialogContentText>
+              {t("editor.settings.transcription.allowedLanguages")}:
+            </DialogContentText>
             <Stack direction="row" spacing={1}>
               {updateConfig[configType].allowed_languages.map((data) => {
                 return (
@@ -125,7 +132,7 @@ export default function TranscriptionSettings(props) {
             </Stack>
             <Select
               value={languageSelect}
-              label="Language"
+              label={t("editor.settings.language")}
               variant="standard"
               onChange={(e) => {
                 setLanguageSelect(e.target.value);
@@ -163,12 +170,13 @@ export default function TranscriptionSettings(props) {
                 }
               }}
             >
-              Add Language
+              {t("editor.settings.addLanguage")}
             </Button>
 
             <Divider />
             <DialogContentText>
-              Default language: {updateConfig[configType].language}
+              {t("editor.settings.transcription.defaultLanguage")}:{" "}
+              {updateConfig[configType].language}
             </DialogContentText>
             <Button
               variant="text"
@@ -176,20 +184,20 @@ export default function TranscriptionSettings(props) {
                 onChangeFunction(configType, "language", currentLanguage)
               }
             >
-              Set Current Language as Default
+              {t("editor.settings.transcription.setCurrentDefault")}
             </Button>
           </>
         )) || (
         <>
           <DialogContentText>
-            Language settings are only available when Azure is connected.
+            {t("editor.settings.transcription.languageAzureConnected")}
           </DialogContentText>
         </>
       )}
       {updateConfig[configType].api === "speechly" && (
         <>
           <TextField
-            label="Speechly App"
+            label={t("editor.settings.transcription.speechlyApp")}
             margin="normal"
             type="password"
             fullWidth
