@@ -7,8 +7,8 @@
     "test": "npm run check && webpack --mode development",
     "format": "npx biome format --write .",
     "check": "npx biome check .",
-    "crowdin-push": "crowdin upload --no-preserve-hierarchy",
-    "crowdin-pull": "crowdin download"
+    "crowdin-push": "env-cmd crowdin upload --no-preserve-hierarchy",
+    "crowdin-pull": "env-cmd crowdin download"
   },
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
@@ -25,6 +25,7 @@
     "bad-words-next": "^2.2.1",
     "bcp-47": "^2.1.0",
     "css-loader": "^6.8.1",
+    "env-cmd": "^10.1.0",
     "get-user-locale": "^2.3.0",
     "i18next": "^23.5.1",
     "i18next-browser-languagedetector": "^7.1.0",
