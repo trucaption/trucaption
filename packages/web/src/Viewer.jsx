@@ -155,7 +155,7 @@ export default function Viewer() {
 
       if (searchParams.has("size")) {
         const fixedSize = searchParams.get("size");
-        if (!isNaN(fixedSize)) {
+        if (!Number.isNaN(fixedSize)) {
           console.log("Setting fixed size");
           setSize(fixedSize);
         }

@@ -177,9 +177,9 @@ function getDefaults(response, config) {
 function sanitizedConfig(configType) {
   const sanitized_config = Object.assign({}, config[configType]);
 
-  CONFIG_SETTINGS[configType].sensitive.forEach((item) => {
+  for (const item of CONFIG_SETTINGS[configType].sensitive) {
     if (sanitized_config[item]) sanitized_config[item] = "defined";
-  });
+  }
 
   return sanitized_config;
 }
@@ -245,9 +245,9 @@ function postConfig(request, response) {
       return;
     }
 
-    CONFIG_SETTINGS[id].sensitive.forEach((item) => {
+    for (const item of CONFIG_SETTINGS[id].sensitive) {
       if (newConfig[item] === "defined") newConfig[item] = config[id][item];
-    });
+    }
 
     if (id === "display") {
       newConfig.font_size = Number.parseInt(newConfig.font_size);

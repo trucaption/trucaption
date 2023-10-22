@@ -84,7 +84,7 @@ export default function App() {
         setUpdateState(t("app.updateNotAvailable"));
       }
     });
-  });
+  }, [versionOptions, t]);
 
   useEffect(() => {
     i18n.changeLanguage(language);
@@ -96,7 +96,7 @@ export default function App() {
     setSettings((prev) => {
       return { ...prev, ...newUrls };
     });
-  }, [language]);
+  }, [language, queryParams, i18n]);
 
   return (
     <ThemeProvider theme={baseTheme}>
