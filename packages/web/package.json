@@ -1,14 +1,15 @@
 {
   "name": "@trucaption/web",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Computer-aided realtime transcription",
   "scripts": {
-    "build": "npm run check && webpack --mode production",
-    "test": "npm run check && webpack --mode development",
+    "build": "yarn check && yarn clean && webpack --mode production",
+    "test": "yarn check && yarn clean && webpack --mode development",
     "format": "npx biome format --write .",
     "check": "npx biome check .",
     "crowdin-push": "env-cmd crowdin upload --no-preserve-hierarchy",
-    "crowdin-pull": "env-cmd crowdin download"
+    "crowdin-pull": "env-cmd crowdin download",
+    "clean": "rimraf ../server/webpack"
   },
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
@@ -54,6 +55,7 @@
     "compression-webpack-plugin": "^10.0.0",
     "html-webpack-plugin": "^5.5.3",
     "node-polyfill-webpack-plugin": "^2.0.1",
+    "rimraf": "^5.0.5",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4"
   }
