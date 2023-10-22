@@ -184,8 +184,12 @@ export default function Editor() {
     updateTranscript(data.target.name, data.target.value, true);
   }
 
-  function onFinalTranscript() {
-    if (finalTranscript) {
+  function downloadTranscript() {
+    fileDownload(Object.values(sentTranscript).join("\n"), "transcript.txt");
+  }
+
+  useEffect(() => {
+    if (finalTranscript && finalTranscript.length !== sentLength) {
       setLine(line + 1);
 
       updateTranscript(
@@ -194,27 +198,18 @@ export default function Editor() {
       );
       setSentLength(finalTranscript.length);
     }
-  }
+  }, [finalTranscript, line, sentLength]);
 
-  function onInterimTranscript() {
+  useEffect(() => {
     if (listening) {
       const cleanTranscript = applyTextEffects(interimTranscript);
 
       setTempTranscript(cleanTranscript);
     }
-  }
-
-  function downloadTranscript() {
-    fileDownload(Object.values(sentTranscript).join("\n"), "transcript.txt");
-  }
-
-  function sendTempTranscript() {
+  }, [interimTranscript, listening]);
+  useEffect(() => {
     sendMessage(JSON.stringify({ text: tempTranscript }), "temp");
-  }
-
-  useEffect(onFinalTranscript, [finalTranscript]);
-  useEffect(onInterimTranscript, [interimTranscript]);
-  useEffect(sendTempTranscript, [tempTranscript]);
+  }, [tempTranscript]);
 
   const endRef = useRef(null);
   useEffect(() => {
@@ -372,9 +367,9 @@ export default function Editor() {
   }
 
   async function loadPage() {
-    Object.keys(activeConfig).forEach((key) => {
+    for (const key of Object.keys(activeConfig)) {
       getConfig(key, setActiveConfig);
-    });
+    }
 
     console.debug(`Detected locale: ${getUserLocale()}`);
 

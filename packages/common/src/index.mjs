@@ -6,9 +6,9 @@ export const CONFIG_SETTINGS = freeze(configSettings);
 export function getDefaultsObject() {
   const output = {};
 
-  Object.keys(configSettings).forEach((key) => {
+  for (const key of Object.keys(configSettings)) {
     output[key] = configSettings[key].defaults;
-  });
+  }
 
   return output;
 }

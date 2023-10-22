@@ -63,14 +63,14 @@ export function trimTranscript(oldValues, newValues, maxLines) {
   const lastLine = Object.keys(finalValues).pop() - maxLines;
 
   if (maxLines >= 0) {
-    Object.keys(finalValues).forEach((key) => {
+    for (const key of Object.keys(finalValues)) {
       if (key <= lastLine) {
         console.debug(
           `Removing line: ${key}, lastLine is ${lastLine}, maxLines is ${maxLines}`,
         );
         delete finalValues[key];
       }
-    });
+    }
   }
 
   return finalValues;
