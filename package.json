@@ -10,7 +10,8 @@
     "start": "yarn workspace trucaption start",
     "release": "yarn check && yarn workspace trucaption release",
     "format": "npx biome format --write .",
-    "check": "npx biome check ."
+    "check": "npx biome check .",
+    "postinstall": "husky install"
   },
   "keywords": [
     "captions",
@@ -29,6 +30,9 @@
   },
   "packageManager": "yarn@3.6.3",
   "devDependencies": {
-    "@biomejs/biome": "^1.3.1"
+    "@biomejs/biome": "^1.3.1",
+    "@commitlint/config-conventional": "^18.0.0",
+    "commitlint": "^18.0.0",
+    "husky": "^8.0.3"
   }
 }
