@@ -4,7 +4,7 @@
     @license GPL-3.0-or-later
 */
 
-import { app, BrowserWindow, shell } from "electron";
+import { BrowserWindow, app, shell } from "electron";
 import log from "electron-log";
 
 import electronUpdater from "electron-updater";
@@ -23,8 +23,8 @@ import { CONFIG_SETTINGS } from "@trucaption/common";
 import fs from "fs";
 import path from "path";
 
-import ip from "ip";
 import querystring from "querystring";
+import ip from "ip";
 
 import { createServer } from "http";
 import RateLimit from "express-rate-limit";
@@ -33,7 +33,7 @@ import locale from "locale-codes";
 import translate from "translate";
 
 const config = {};
-var clientIo = null;
+let clientIo = null;
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -42,13 +42,13 @@ function createWindow() {
   });
 
   const data = querystring.stringify({
-    editorPort: config["app"].editor_port,
-    viewerPort: config["app"].viewer_port,
+    editorPort: config.app.editor_port,
+    viewerPort: config.app.viewer_port,
     version: app.getVersion(),
     viewerIP: ip.address(),
   });
 
-  win.loadURL(`http://localhost:${config["app"].editor_port}/app/?${data}`);
+  win.loadURL(`http://localhost:${config.app.editor_port}/app/?${data}`);
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -99,11 +99,11 @@ export async function runServer(__dirname) {
 
   const { AppServer: clientApp, HttpServer: clientHttp } = runWebServer(
     path.join(__dirname, "../webpack/viewer"),
-    config["app"].viewer_port,
+    config.app.viewer_port,
   );
   const { AppServer: controllerApp } = runWebServer(
     path.join(__dirname, "../webpack/editor"),
-    config["app"].editor_port,
+    config.app.editor_port,
     true,
   );
 
@@ -121,7 +121,7 @@ export async function runServer(__dirname) {
 
   controllerApp.post("/message", postMessage);
 
-  clientIo.of(`/default`);
+  clientIo.of("/default");
   setupTranslation();
 
   createWindow();
@@ -161,11 +161,11 @@ function getDefaults(response, config) {
   try {
     response.send({
       topic: "",
-      font_size: parseInt(config["display"].font_size),
-      max_lines: parseInt(config["display"].max_lines),
+      font_size: parseInt(config.display.font_size),
+      max_lines: parseInt(config.display.max_lines),
       translation: {
-        enabled: config["translation"].enabled,
-        languages: config["translation"].languages,
+        enabled: config.translation.enabled,
+        languages: config.translation.languages,
       },
     });
   } catch (error) {
@@ -188,13 +188,13 @@ async function getConnect(request, response) {
   const responseJson = {};
 
   try {
-    if (config["transcription"].api === "azure") {
+    if (config.transcription.api === "azure") {
       const apiResponse = await axios({
         method: "post",
-        url: `https://${config["transcription"].azure_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
+        url: `https://${config.transcription.azure_region}.api.cognitive.microsoft.com/sts/v1.0/issueToken?expiredTime=86400`,
         headers: {
           "Ocp-Apim-Subscription-Key":
-            config["transcription"].azure_subscription_key,
+            config.transcription.azure_subscription_key,
           "Content-length": 0,
           "Content-type": "application/x-www-form-urlencoded",
         },
@@ -202,19 +202,19 @@ async function getConnect(request, response) {
 
       const azureLanguagesResponse = await axios({
         method: "get",
-        url: `https://${config["transcription"].azure_region}.api.cognitive.microsoft.com/speechtotext/v3.1/evaluations/locales`,
+        url: `https://${config.transcription.azure_region}.api.cognitive.microsoft.com/speechtotext/v3.1/evaluations/locales`,
         headers: {
           "Ocp-Apim-Subscription-Key":
-            config["transcription"].azure_subscription_key,
+            config.transcription.azure_subscription_key,
         },
       });
 
-      responseJson["azureToken"] = apiResponse.data;
-      responseJson["azureLanguages"] = azureLanguagesResponse.data;
+      responseJson.azureToken = apiResponse.data;
+      responseJson.azureLanguages = azureLanguagesResponse.data;
     }
 
-    if (config["transcription"].api === "speechly") {
-      responseJson["speechly_app"] = config["transcription"].speechly_app;
+    if (config.transcription.api === "speechly") {
+      responseJson.speechly_app = config.transcription.speechly_app;
     }
 
     response.send(responseJson);
@@ -239,7 +239,7 @@ function postConfig(request, response) {
     logConnection(request, `Received config POST for ${request.body.type}`);
     const newConfig = Object.assign({}, request.body.config);
 
-    let id = request.body.type;
+    const id = request.body.type;
     if (id === "__proto__" || id === "constructor" || id === "prototype") {
       response.end(403);
       return;
