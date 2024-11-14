@@ -7,7 +7,6 @@ build/*
 !build/package.json
 config.json
 vendor
-yarn.lock
 .yarn
 packages/server/out
 .env
