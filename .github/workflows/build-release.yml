@@ -22,7 +22,7 @@ jobs:
       - name: Enable corepack
         run: |
           corepack enable
-          yarn
+          corepack prepare yarn@4.5.1 --activate
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
