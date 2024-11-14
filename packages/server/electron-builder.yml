@@ -1,31 +1,11 @@
-afterSign: electron-builder-notarize
 appId: com.trucaption
 asar: false
-forceCodeSigning: true
 productName: Trucaption
-files:
-  - "!electron-builder.env"
 win:
-  certificateSubjectName: Open Source Developer, Derek Kaser
+  signAndEditExecutable: false
   target:
     - target: nsis
       arch:
         - x64
-mac:
-  category: public.app-category.utilities
-  notarize: false
-  target:
-    - target: default
-      arch:
-        - universal
-dmg:
-  contents:
-    - x: 448
-      y: 344
-      type: link
-      path: /Applications
-    - x: 192
-      y: 344
-      type: file
 nsis:
   shortcutName: Trucaption

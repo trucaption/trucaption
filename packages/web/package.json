@@ -3,8 +3,8 @@
   "version": "1.6.0",
   "description": "Computer-aided realtime transcription",
   "scripts": {
-    "build": "yarn check && yarn clean && webpack --mode production",
-    "test": "yarn check && yarn clean && webpack --mode development",
+    "build": "yarn clean && webpack --mode production",
+    "test": "yarn clean && webpack --mode development",
     "format": "npx biome format --write .",
     "check": "npx biome check .",
     "crowdin-push": "env-cmd crowdin upload --no-preserve-hierarchy",

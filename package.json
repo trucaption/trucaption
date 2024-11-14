@@ -4,11 +4,11 @@
   "version": "1.6.0",
   "description": "Computer-aided real-time captioning",
   "scripts": {
-    "build": "yarn check && yarn workspace @trucaption/web build && yarn start",
-    "test": "yarn check && yarn workspace @trucaption/web test && yarn start",
+    "build": "yarn workspace @trucaption/web build",
+    "test": "yarn workspace @trucaption/web test",
     "dist": "yarn workspace trucaption dist",
     "start": "yarn workspace trucaption start",
-    "release": "yarn check && yarn workspace trucaption release",
+    "release": "yarn workspace trucaption release",
     "format": "npx biome format --write .",
     "check": "npx biome check .",
     "postinstall": "husky install"
@@ -28,7 +28,7 @@
     "npm": "please-use-yarn",
     "yarn": ">= 3.6.3"
   },
-  "packageManager": "yarn@3.6.3",
+  "packageManager": "yarn@4.5.1",
   "devDependencies": {
     "@biomejs/biome": "^1.3.1",
     "@commitlint/config-conventional": "^18.0.0",

@@ -5,8 +5,8 @@
   "main": "src/server.cjs",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder",
-    "release": "electron-builder"
+    "dist": "electron-builder -w",
+    "release": "electron-builder -w"
   },
   "keywords": [
     "captions",
