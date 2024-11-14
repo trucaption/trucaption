@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Enable corepack
         run: |
@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: yarn
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
