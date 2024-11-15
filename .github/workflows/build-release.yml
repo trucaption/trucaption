@@ -32,8 +32,10 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           app_root: packages/server
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: result
-          path: packages/server/dist/
+        env:
+          AZURE_SIGN_ENDPOINT: ${{ secrets.AZURE_SIGN_ENDPOINT }}
+          AZURE_SIGN_ACCOUNT_NAME: ${{ secrets.AZURE_SIGN_ACCOUNT_NAME }}
+          AZURE_CERT_PROFILE_NAME: ${{ secrets.AZURE_CERT_PROFILE_NAME }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
