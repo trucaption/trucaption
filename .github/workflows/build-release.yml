@@ -32,3 +32,8 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           app_root: packages/server
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: result
+          path: packages/server/dist/
