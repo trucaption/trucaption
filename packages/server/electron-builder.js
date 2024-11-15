@@ -16,6 +16,7 @@ const config = {
   },
   nsis: {
     shortcutName: "Trucaption",
+    artifactName: "${productName}-${version}.${ext}",
   },
 };
 module.exports = config;
