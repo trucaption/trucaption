@@ -68,7 +68,7 @@ export default function App() {
   const drawerWidth = 300;
 
   useEffect(() => {
-    versionCheck(versionOptions, function (error, update) {
+    versionCheck(versionOptions, (error, update) => {
       if (error) {
         console.log(error);
         return;

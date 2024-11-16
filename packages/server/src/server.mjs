@@ -20,13 +20,13 @@ import { Server } from "socket.io";
 
 import { CONFIG_SETTINGS } from "@trucaption/common";
 
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
-import querystring from "querystring";
+import querystring from "node:querystring";
 import ip from "ip";
 
-import { createServer } from "http";
+import { createServer } from "node:http";
 import RateLimit from "express-rate-limit";
 
 import locale from "locale-codes";
@@ -143,7 +143,7 @@ function runWebServer(DIST_DIR, port, localOnly = false) {
   app.use("/", limiter, expressStaticGzip(DIST_DIR));
 
   //Send index.html when the user access the web
-  app.get("/", limiter, function (req, res) {
+  app.get("/", limiter, (req, res) => {
     res.sendFile(path.join(DIST_DIR, "index.html"));
   });
 
@@ -161,8 +161,8 @@ function getDefaults(response, config) {
   try {
     response.send({
       topic: "",
-      font_size: parseInt(config.display.font_size),
-      max_lines: parseInt(config.display.max_lines),
+      font_size: Number.parseInt(config.display.font_size),
+      max_lines: Number.parseInt(config.display.max_lines),
       translation: {
         enabled: config.translation.enabled,
         languages: config.translation.languages,

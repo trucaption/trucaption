@@ -13,17 +13,11 @@
     "check": "npx biome check .",
     "postinstall": "husky install"
   },
-  "keywords": [
-    "captions",
-    "transcript",
-    "cart"
-  ],
+  "keywords": ["captions", "transcript", "cart"],
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
   "repository": "github:trucaption/trucaption",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">= 3.6.3"

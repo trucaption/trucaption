@@ -114,6 +114,7 @@ export default function TranscriptionSettings(props) {
                 return (
                   <>
                     <Chip
+                      key={data}
                       label={data}
                       onDelete={(event) => {
                         onChangeFunction(
@@ -188,27 +189,23 @@ export default function TranscriptionSettings(props) {
             </Button>
           </>
         )) || (
-        <>
-          <DialogContentText>
-            {t("editor.settings.transcription.languageAzureConnected")}
-          </DialogContentText>
-        </>
+        <DialogContentText>
+          {t("editor.settings.transcription.languageAzureConnected")}
+        </DialogContentText>
       )}
       {updateConfig[configType].api === "speechly" && (
-        <>
-          <TextField
-            label={t("editor.settings.transcription.speechlyApp")}
-            margin="normal"
-            type="password"
-            fullWidth
-            variant="standard"
-            required
-            value={updateConfig[configType].speechly_app}
-            onChange={(event) =>
-              onChangeFunction(configType, "speechly_app", event.target.value)
-            }
-          />
-        </>
+        <TextField
+          label={t("editor.settings.transcription.speechlyApp")}
+          margin="normal"
+          type="password"
+          fullWidth
+          variant="standard"
+          required
+          value={updateConfig[configType].speechly_app}
+          onChange={(event) =>
+            onChangeFunction(configType, "speechly_app", event.target.value)
+          }
+        />
       )}
     </SettingsDialog>
   );
