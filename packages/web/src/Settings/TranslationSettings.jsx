@@ -90,6 +90,7 @@ export default function TranslationSettings(props) {
               return (
                 <>
                   <Chip
+                    key={data}
                     label={data}
                     onDelete={(event) => {
                       onChangeFunction(
