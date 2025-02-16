@@ -183,10 +183,10 @@ export default function Viewer() {
   }, [maxLines, room]);
 
   useEffect(() => {
-    if(scrollbar) {
-      document.body.style.overflowY = 'auto';
+    if (scrollbar) {
+      document.body.style.overflowY = "auto";
     } else {
-      document.body.style.overflowY = 'hidden';
+      document.body.style.overflowY = "hidden";
     }
   }, [scrollbar]);
 
