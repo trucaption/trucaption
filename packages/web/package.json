@@ -1,6 +1,6 @@
 {
   "name": "@trucaption/web",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Computer-aided realtime transcription",
   "scripts": {
     "build": "yarn clean && webpack --mode production",

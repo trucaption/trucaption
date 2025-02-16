@@ -136,7 +136,7 @@ function runWebServer(DIST_DIR, port, localOnly = false) {
 
   const limiter = RateLimit({
     windowMs: 60 * 1000,
-    max: 100,
+    max: 250,
   });
 
   //Serving the files on the dist folder

@@ -1,6 +1,6 @@
 {
   "name": "trucaption",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Computer-aided real-time captioning",
   "main": "src/server.cjs",
   "scripts": {
@@ -8,7 +8,11 @@
     "dist": "electron-builder -w",
     "release": "electron-builder -w"
   },
-  "keywords": ["captions", "transcript", "cart"],
+  "keywords": [
+    "captions",
+    "transcript",
+    "cart"
+  ],
   "author": "Derek Kaser",
   "license": "GPL-3.0-or-later",
   "repository": "github:trucaption/trucaption",
