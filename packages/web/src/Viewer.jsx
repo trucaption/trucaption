@@ -60,6 +60,7 @@ export default function Viewer() {
   const [size, setSize] = useState(20);
   const [room, setRoom] = useState("default");
   const [open, setOpen] = useState(false);
+  const [scrollbar, setScrollbar] = useState(true);
   const [maxLines, setMaxLines] = useState(
     CONFIG_SETTINGS.display.defaults.max_lines,
   );
@@ -153,6 +154,10 @@ export default function Viewer() {
         setRoom(searchParams.get("language"));
       }
 
+      if (searchParams.has("noScrollbar")) {
+        setScrollbar(false);
+      }
+
       if (searchParams.has("size")) {
         const fixedSize = searchParams.get("size");
         if (!Number.isNaN(fixedSize)) {
@@ -176,6 +181,14 @@ export default function Viewer() {
 
     initializeSocket();
   }, [maxLines, room]);
+
+  useEffect(() => {
+    if(scrollbar) {
+      document.body.style.overflowY = 'auto';
+    } else {
+      document.body.style.overflowY = 'hidden';
+    }
+  }, [scrollbar]);
 
   return (
     <ThemeProvider theme={baseTheme}>
