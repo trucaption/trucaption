@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [macos-latest, windows-latest]
 
     steps:
       - name: Check out Git repository
@@ -24,6 +24,13 @@ jobs:
           corepack enable
           corepack prepare yarn@4.5.1 --activate
 
+      - name: Prepare for app notarization
+        if: startsWith(matrix.os, 'macos')
+        # Import Apple API key for app notarization on macOS
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.MAC_API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.MAC_API_KEY_ID }}.p8
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
@@ -32,6 +39,8 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           app_root: packages/server
+          mac_certs: ${{ secrets.MAC_CERTS }}
+          mac_certs_password: ${{ secrets.MAC_CERTS_PASSWORD }}
         env:
           AZURE_SIGN_ENDPOINT: ${{ secrets.AZURE_SIGN_ENDPOINT }}
           AZURE_SIGN_ACCOUNT_NAME: ${{ secrets.AZURE_SIGN_ACCOUNT_NAME }}
@@ -39,3 +48,7 @@ jobs:
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.MAC_API_KEY_ID }}
+          API_KEY_ISSUER_ID: ${{ secrets.MAC_API_KEY_ISSUER_ID }}

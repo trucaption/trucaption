@@ -1,6 +1,10 @@
 const config = {
   appId: "com.trucaption",
   productName: "Trucaption",
+  afterSign: "electron-builder-notarize",
+  mac: {
+    "hardenedRuntime": true
+  },
   win: {
     target: [
       {
