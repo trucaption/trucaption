@@ -52,8 +52,7 @@
         "browser": "Navegador",
         "defaultLanguage": "Idioma por Defecto",
         "languageAzureConnected": "Los ajustes de idioma solo están disponibles cuando Azure está conectado.",
-        "setCurrentDefault": "Establece el idioma actual por defecto",
-        "speechlyApp": "App de Speechly"
+        "setCurrentDefault": "Establece el idioma actual por defecto"
       },
       "translation": {
         "apiKey": "Llave de API",

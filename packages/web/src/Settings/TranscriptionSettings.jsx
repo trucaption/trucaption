@@ -55,7 +55,6 @@ export default function TranscriptionSettings(props) {
           {t("editor.settings.transcription.browser")}
         </MenuItem>
         <MenuItem value="azure">Azure</MenuItem>
-        <MenuItem value="speechly">Speechly</MenuItem>
       </Select>
       {updateConfig[configType].api === "azure" && (
         <>
@@ -192,20 +191,6 @@ export default function TranscriptionSettings(props) {
         <DialogContentText>
           {t("editor.settings.transcription.languageAzureConnected")}
         </DialogContentText>
-      )}
-      {updateConfig[configType].api === "speechly" && (
-        <TextField
-          label={t("editor.settings.transcription.speechlyApp")}
-          margin="normal"
-          type="password"
-          fullWidth
-          variant="standard"
-          required
-          value={updateConfig[configType].speechly_app}
-          onChange={(event) =>
-            onChangeFunction(configType, "speechly_app", event.target.value)
-          }
-        />
       )}
     </SettingsDialog>
   );

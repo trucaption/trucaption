@@ -39,7 +39,8 @@
         "clearTemp": "Clear interim transcript on stop",
         "defaultFontSize": "Default Font Size",
         "maxLines": "Maximum Lines",
-        "wordFilter": "Use word filter"
+        "wordFilter": "Use word filter",
+        "strip_punctuation": "Remove punctuation"
       },
       "engine": "Engine",
       "language": "Language",
@@ -52,8 +53,7 @@
         "browser": "Browser",
         "defaultLanguage": "Default Language",
         "languageAzureConnected": "Language settings are only available when Azure is connected.",
-        "setCurrentDefault": "Set Current Language as Default",
-        "speechlyApp": "Speechly App"
+        "setCurrentDefault": "Set Current Language as Default"
       },
       "translation": {
         "apiKey": "API Key",

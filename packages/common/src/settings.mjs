@@ -14,6 +14,7 @@ export const configSettings = {
       clear_temp_on_stop: false,
       word_filter: true,
       all_caps: false,
+      strip_punctuation: false,
     },
     sensitive: [],
     file: "display.json",
@@ -26,9 +27,8 @@ export const configSettings = {
       azure_region: "",
       azure_subscription_key: "",
       language: "en-US",
-      speechly_app: "",
     },
-    sensitive: ["azure_subscription_key", "speechly_app"],
+    sensitive: ["azure_subscription_key"],
     file: "transcription.json",
   },
   translation: {

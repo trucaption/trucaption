@@ -213,10 +213,6 @@ async function getConnect(request, response) {
       responseJson.azureLanguages = azureLanguagesResponse.data;
     }
 
-    if (config.transcription.api === "speechly") {
-      responseJson.speechly_app = config.transcription.speechly_app;
-    }
-
     response.send(responseJson);
   } catch (error) {
     log.error(`${error.message}`);

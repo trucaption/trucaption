@@ -2,15 +2,13 @@ const config = {
   appId: "com.trucaption",
   productName: "Trucaption",
   mac: {
-    "hardenedRuntime": true,
+    hardenedRuntime: true,
     target: [
       {
         target: "default",
-        arch: [
-          "universal"
-        ]
-      }
-    ]
+        arch: ["universal"],
+      },
+    ],
   },
   win: {
     target: [

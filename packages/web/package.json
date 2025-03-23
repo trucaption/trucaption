@@ -19,7 +19,6 @@
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.5",
-    "@speechly/speech-recognition-polyfill": "^1.3.0",
     "@trucaption/common": "workspace:^",
     "@version-checker/browser": "^3.1.0",
     "axios": "^1.4.0",

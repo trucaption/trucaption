@@ -164,6 +164,8 @@ export default function Editor() {
     if (activeConfig.display.word_filter)
       finalText = badwords.filter(finalText);
     if (activeConfig.display.all_caps) finalText = finalText.toUpperCase();
+    if (activeConfig.display.strip_punctuation)
+      finalText = finalText.replaceAll("/[.,?/g", "");
 
     return finalText.trim();
   }
@@ -239,10 +241,7 @@ export default function Editor() {
 
     let targetDict = "en";
 
-    if (
-      activeConfig.transcription.api === "azure" ||
-      activeConfig.transcription.api === "speechly"
-    ) {
+    if (activeConfig.transcription.api === "azure") {
       listeningConfig.language = currentLanguage;
       targetDict = locale.getByTag(currentLanguage)["iso639-1"];
       console.log(
@@ -327,21 +326,6 @@ export default function Editor() {
         setCurrentLanguage(activeConfig.transcription.language);
         console.debug(locale.getByTag(activeConfig.transcription.language));
         console.log("Initialized Azure Speech Services");
-        break;
-      }
-
-      case "speechly": {
-        const { createSpeechlySpeechRecognition } = await import(
-          "@speechly/speech-recognition-polyfill"
-        );
-
-        const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(
-          response.data.speechly_app,
-        );
-        setAllowedLanguages([CONFIG_SETTINGS.transcription.defaults.language]);
-        setCurrentLanguage(CONFIG_SETTINGS.transcription.defaults.language);
-        SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
-        console.log("Initialized Speechly");
         break;
       }
 

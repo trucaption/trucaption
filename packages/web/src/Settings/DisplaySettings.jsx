@@ -71,6 +71,22 @@ export default function DisplaySettings(props) {
         }
         label={t("editor.settings.display.allCaps")}
       />
+
+      <FormControlLabel
+        control={
+          <Switch
+            checked={updateConfig[configType].strip_punctuation}
+            onChange={(event) =>
+              onChangeFunction(
+                configType,
+                "strip_punctuation",
+                event.target.checked,
+              )
+            }
+          />
+        }
+        label={t("editor.settings.display.strip_punctuation")}
+      />
     </SettingsDialog>
   );
 }
